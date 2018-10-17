@@ -1,0 +1,257 @@
+{% extends "BasePage.html" %}
+{% block content %}
+
+    <script type="text/javascript">
+    function validateForm()
+    {
+        var x=document.forms["auth"]["pwd"].value;
+        var y=document.forms["auth"]["conf_pwd"].value;
+        var errstr="";
+        var isvalid=true;
+        if (x!=y)
+        {
+            errstr="Пароль не совпадает с подтверждением!\n";
+            document.forms["auth"]["pwd"].value="";
+            document.forms["auth"]["conf_pwd"].value="";
+            document.forms["auth"]["pwd"].focus();
+            isvalid=false;
+        }
+        if (x.length<{{ session.pwdminlenth }})
+        {
+            isvalid=false;
+            errstr+="Слишком короткий пароль\n"
+        }
+
+
+        maxdt=new Date();
+        yy=maxdt.getFullYear();
+        maxdt.setFullYear(yy-10);
+        bddate =new Date(document.forms["auth"]["bd"].value);
+
+        if(bddate>maxdt)
+        {
+            isvalid=false;
+            errstr+="участник слишком молод\n"
+
+        }
+
+        if (!isvalid) alert(errstr);
+        return isvalid;
+    }
+    </script>
+
+    <script src={{url_for('static', filename='ckeditor/ckeditor.js') }}></script>
+
+    <div>
+    <form id="auth" action="" method="post" onsubmit="return validateForm()" class="auth">
+<!--          <center>
+            <fieldset class ="fst" >
+-->            <input hidden value="{{ session.id_member }}" id="id_member" type="text" name="id_member">
+
+                    <table id = "regtable">
+                        {% if session['regim']==edit %}
+                            <caption>Изменение данных профиля</caption>
+                        {% else %}
+                            {% if session['res_reg']==False  %}
+                                <caption>{{ session.errorstr }}</caption>
+                            {% else %}
+                                <caption >Регистрация пользователя</caption>
+                            {% endif %}
+                        {% endif %}
+
+                            <tr>
+                                <td>
+                                    <label for="lgn">Логин</label>
+                                </td>
+                                <td>
+                                    <input class="inpreg" value="{{ session.lgn }}" autofocus required tabindex="1" id="lgn" type="text" name="lgn" size="15" placeholder="Строка для входа на сайт" title="Строка для входа на сайт">
+                                </td>
+
+                                <td>
+                                    <label for="bd">Дата рождения</label>
+                                </td>
+                                <td>
+                                    <input class="inpreg" value="{{ session.bd }}" required tabindex="8" id="bd" type="date" name="bd" size="15"><br/>
+                                </td>
+
+
+
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="pwd">Пароль</label>
+                                </td>
+                                <td>
+                                    <input required class="inpreg" tabindex="2" id="pwd" type="password" name="pwd" size="15" placeholder="Не менее 6 символов" title="Не менее 6 символов">
+                                </td>
+
+                                <td>
+                                    <label for="sex">Пол</label>
+                                </td>
+                                <td>
+                                    <select class = "selreg" size="1" tabindex="9" name="sex" id="sex">
+                                        <option disabled>Пол</option>
+                                        {% if session['sex']=='М' %}
+                                            <option selected value="М">Мужской</option>
+                                            <option value="Ж">Женский</option>
+                                        {% else %}
+                                            <option selected value="М">Мужской</option>
+                                            <option value="Ж">Женский</option>
+                                        {% endif %}
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="conf_pwd">Подтв. пароля</label>
+                                </td>
+                                <td>
+                                    <input required class="inpreg" tabindex="3" id="conf_pwd" type="password" name="conf_pwd" size="15" placeholder="Должен совпадать с паролем" title="должен совпадать с паролем">
+                                </td>
+                                <td>
+                                    <label for="em">Эл.почта</label>
+                                </td>
+                                <td>
+                                    <input  class="inpreg" value="{{ session.em }}" required tabindex="10" id="em" type="email" name="em" size="15" >
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="fml">Фамилия</label>
+                                </td>
+                                <td>
+                                    <input class="inpreg" value="{{ session.fml }}" required tabindex="4" id="fml" type="text" name="fml" size="15" >
+                                </td>
+                                <td>
+                                    <label for="ph">Телефон</label>
+                                </td>
+                                <td>
+                                    <input  class="inpreg" value="{{ session.ph  }}" title="Формат +X(XXX)XXX-XX-XX" required tabindex="11" id="ph" type="text" name="ph" pattern="\+{0,1}\d\([0-9]{3}\)[0-9]{3}-[0-9]{2}-[0-9]{2}" size="15" placeholder="+7(XXX)XXX-XX-XX">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="nm">Имя</label>
+                                </td>
+                                <td>
+                                    <input class="inpreg" value ="{{ session.nm }}" required tabindex="5" id="nm" type="text" name="nm" size="15" >
+                                </td>
+
+                                <td>
+                                    <label for="comp_nm">Организация</label>
+                                </td>
+                                <td>
+                                    <select class = "selreg" tabindex="12" id="comp_nm" name="comp_nm" size="1" >
+                                        {% if session.comp_nm==-1 %}
+                                            <option selected value=-1>не указано</option>
+                                        {% else %}
+                                            <option  value=-1>не указано</option>
+                                        {% endif %}
+
+                                        {% for comp in session.res_org %}
+                                            {% if comp[0]==session.comp_nm %}
+                                                <option selected value={{ comp[0] }}>{{ comp[1] }}</option>
+                                            {% else %}
+                                                <option value={{ comp[0] }}>{{ comp[1] }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="sn">Отчество</label>
+                                </td>
+                                <td>
+                                    <input class="inpreg" value="{{ session.sn }}"required tabindex="6" id="sn" type="text" name="sn" size="15">
+                                </td>
+                                <td>
+                                    <label for="dlgn">Должность </label>
+                                </td>
+                                <td>
+                                    <select class = "selreg" id="dlgn" tabindex="13" name="dlgn" >
+                                       {% if session.dlgn=="-1" %}
+                                            <option selected value=-1>не указано</option>
+                                        {% else %}
+                                            <option value=-1>не указано</option>
+                                        {% endif %}
+                                        {% for dolgn in session.dolgns %}
+                                            {% if session.dlgn==dolgn[0] %}
+                                                <option selected value={{ dolgn[0] }}>{{ dolgn[1] }}</option>
+                                            {% else %}
+                                                <option value={{ dolgn[0] }}>{{ dolgn[1] }}</option>
+                                            {% endif %}
+
+                                        {% endfor %}
+
+                                    </select>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="adr">Проживание (нас.пункт)</label>
+                                </td>
+                                <td>
+                                    <input class="inpreg" value="{{ session.adr }}" required tabindex="7" id="adr" type="text" name="adr" size="15">
+                                </td>
+                                <td>
+                                    <label for="uzv">Уч. звание</label>
+                                </td>
+                                <td>
+                                    <select class = "selreg" tabindex="14" id="uzv"  name="uzv" size="1">
+                                        {% if session.uzv=="-1" %}
+                                            <option selected value=-1>не указано</option>
+                                        {% else %}
+                                            <option value=-1>не указано</option>
+                                        {% endif %}
+                                        {% for uzv in session.uzvs %}
+                                            {% if session.uzv==uzv[0] %}
+                                                <option selected value={{ uzv[0] }}>{{ uzv[1] }}</option>
+                                            {% else %}
+                                                <option value={{ uzv[0] }}>{{ uzv[1] }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+
+                                    </select>
+                                </td>
+
+                            </tr>
+                            <tr class="rowcenter">
+                                <td colspan="4">
+                                    <b for="sn"><b>Доп.информация</b></label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">
+                                    <textarea  value="{{ session.add_info }}" tabindex="15" id="add_info" rows="3" name="add_info">
+                                    </textarea>
+                                    <script>
+
+                                        CKEDITOR.replace( 'add_info' );
+
+                                    </script>
+                                </td>
+                            </tr>
+                            <tr class="rowcenter">
+                                <td colspan="2" >
+                                    <input type="submit" tabindex="16" value="Регистрация" name="sub">
+                                </td>
+
+                                <td colspan="2" >
+                                     <input type="button" tabindex="17" value="Отмена" name="break" onclick="location.href='/' ">
+                                </td>
+
+                            </tr>
+
+
+                    </table>
+
+
+<!--
+            </fieldset>
+<!--         </center>
+-->
+        </form>
+    </div>
+{% endblock %}

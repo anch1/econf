@@ -1,0 +1,75 @@
+        <!DOCTYPE html>
+    <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1">
+
+            {% if title %}
+                <title>{{ title }}</title>
+            {% else %}
+                <title>Электронные конференции</title>
+            {% endif %}
+
+            <link rel="stylesheet" href="/static/css/style.css">
+
+    <!-- Подключение библиотеки jQuery
+            <script src="./jquery.js"></script>
+    Подключение jQuery плагина Masked Input
+            <script src="./jquery.maskedinput.min.js"></script>
+    Inline scripts are forbidden in Firefox OS apps (CSP restrictions),
+             so we use a script file.
+
+            <script src="app.js" defer></script> -->
+
+        </head>
+
+        <body>
+            <div class="header">
+                    <ul class="top-menu">
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/">Конференции</a></li>
+<!--                        <li><a href="/">Админ</a></li> -->
+                        {% if session['enter_enabled']==True %}
+                            <li><a href="/registration/">Регистрация</a></li>
+                            <li><a href="/zlist/1">Заявки</a></li>
+                        {% else %}
+                            <li><a href="/edit_profil/">Мой профиль</a></li>
+                            <li><a href="/zlist/1">Мои заявки</a></li>
+
+                        {% endif %}
+
+                        {% if session['usrr'][0]=='1' %}
+                            <li><a href="/userlist/1">Пользователи</a></li>
+                        {% endif %}
+
+
+                        {% if session['enter_enabled']==True %}
+                            <li><a href="/login/">Вход</a></li>
+                        {% else %}
+                            <li><a href="/logout/">Выход</a></li>
+                        {% endif %}
+                    </ul>
+
+            </div>
+            <div class="conteyner">
+                <div class="left-box">
+                        здесь много-много маленьких боксиков
+                    <div class="inner-left-box">
+                        содержимое блока
+                        тут надо много чего-нибудь писать
+                    </div>
+                </div>
+                <div class="content-box">
+
+                    {% block content %}
+                    {% endblock %}
+
+                </div>
+&nbsp
+            </div>
+            <div class="foot">
+                <p  id="version">  Версия {{ ver }} </p>
+            </div>
+
+        </body>
+    </html>

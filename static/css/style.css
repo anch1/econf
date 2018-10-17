@@ -1,0 +1,235 @@
+/* Главная менюшечка */
+body    {
+            background-color: whitesmoke;
+            min-width:1024px;
+
+        }
+.header {
+            padding: 0px;
+            margin:0px;
+            width: auto;
+            min-width:1024px;
+            height:4em;
+            background-color: azure;
+            border: 1px solid black;
+            border-radius: 10px;
+            box-shadow: 3px 3px 3px 3px black;
+        }
+
+.top-menu {
+            margin:2px;
+            padding:5px;
+            list-style-type: none;
+        }
+
+.top-menu > li{
+            margin:5px;
+            padding:10px;
+            float:left;
+            width:130px;
+            border: 1px solid black;
+            border-radius: 10px;
+        }
+.top-menu > li >a {
+            text-decoration: none;
+        }
+.top-menu > li:hover{
+            background-color: aqua;
+            color:azure;
+
+        }
+.conteyner{
+            position: relative;
+            min-height:340px;
+}
+
+.left-box{
+            margin-top:20px;
+            margin-left:0px;
+            padding: 10px;
+            width:200px;
+            min-height:300px;
+            background-color: azure;
+            border: 1px solid black;
+            border-radius: 10px;
+            box-shadow: 3px 3px 3px 3px black;
+            float:left;
+        }
+
+.inner-left-box {
+    margin:0px;
+    padding:3px;
+    border: 1px solid black;
+    border-radius: 5px;
+        }
+
+
+.content-box{
+            margin-top:20px;
+            margin-left:20px;
+            padding: 10px;
+/*            width:900px;*/
+            width:calc(100% - 264px);
+            min-width:200px;
+            min-height:300px;
+            background-color: azure;
+            border: 1px solid black;
+            border-radius: 10px;
+            box-shadow: 3px 3px 3px 3px black;
+            float:left;
+    }
+
+/*футер */
+.foot   {
+            width: auto;
+
+            margin-top:20px;
+            padding: 10px;
+            background-color: azure;
+            border:  1px solid black;
+            border-radius: 10px;
+            box-shadow: 3px 3px 3px 3px black;
+
+        }
+
+#version {
+    text-align: right;
+}
+
+/*
+Форма регистрации
+ */
+.wlcm{
+    text-align: center;
+}
+
+table caption{
+    text-align: center;
+    font-size:large;
+    margin: 10px;
+}
+
+#add_info{width:100%;
+}
+#logtable,#regtable , #edapplicationtable  {
+            border-spacing:10px 10px;
+        }
+
+#bd{height: 1ex;}
+
+.selreg{
+    width:23ex;
+}
+.inpreg{
+    width:20ex;
+}
+
+
+
+.currentpage{
+    background-color:aqua;
+}
+.pagerow{
+    text-align: center;
+    margin-top: 20px;
+}
+.nextprew{
+    margin-left: 4ex;
+    margin-right: 4ex;
+}
+#ulisttable, #zlisttable{
+    text-align: left;
+    border-spacing:30px 10px;
+}
+/*Добавление заявки*/
+.rowcenter{text-align: center;}
+#date_from , #date_to, #dline_issue , #dline_decision{
+    height: 1ex;
+
+}
+#theme{
+    width:96%;
+
+}
+#type_sc{
+    width:100%;
+}
+.inpapp{
+    width:20ex;
+}
+.selapp{
+    width:23ex;
+}
+.backbutton
+{
+    text-align: center;
+}
+
+/* цвет текущей страницы в списке страниц */
+/*
+.top-menu {
+margin: 0 60px;
+position: relative;
+background: #5A394E;
+box-shadow:
+inset 1px 0 0 rgba(255,255,255,.1),
+inset -1px 0 0 rgba(255,255,255,.1),
+inset 150px 0 150px -150px rgba(255,255,255,.12),
+inset -150px 0 150px -150px rgba(255,255,255,.12);
+}
+
+.menu-main {
+list-style: none;
+padding: 0;
+margin: 0;
+text-align: center;
+}
+
+.menu-main li {
+display: inline-block;
+margin-right: -4px;
+}
+.menu-main a {
+text-decoration: none;
+display: inline-block;
+padding: 15px 30px;
+font-family: 'PT Sans Caption', sans-serif;
+color: white;
+transition: .3s linear;
+}
+
+.menu-main a.current,
+.menu-main a:hover {background: rgba(0,0,0,.2);}
+@media (max-width: 680px) {
+.top-menu {margin: 0;}
+.menu-main li {
+display: block;
+margin-right: 0;
+}
+.menu-main:before,
+.menu-main:after {content: none;}
+.menu-main a {display: block;}
+}
+
+
+.f1 {
+  background-color: whitesmoke;)
+  padding: 5px 25px;
+  margin: 0;
+  color: blue;
+}
+.fst{
+    margin:                                                                                                     ;: 0 auto;
+  background-color: red;
+  width: 280px;
+}
+
+.invate{
+text-align: center;
+}
+.btns{
+  text-align: center;
+  style: "float: left; margin-right: 3px";
+}
+
+*/

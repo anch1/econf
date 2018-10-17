@@ -1,0 +1,12 @@
+{% extends "BasePage.html" %}
+{% block content %}
+    <div class="wlcm">
+        <h1>
+            Здравствуйте {{ session.nm }} {{ session.sn }} <br/> Добро пожаловать на сайт!
+        </h1>
+
+        <input type="submit"  value="На главную" name="cont" onclick="location.href='/' ">
+
+
+    </div>
+{% endblock %}

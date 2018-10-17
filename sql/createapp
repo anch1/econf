@@ -1,0 +1,30 @@
+-- Table: public.application
+
+-- DROP TABLE public.application;
+
+CREATE TABLE public.application
+(
+  id_application integer NOT NULL DEFAULT nextval('application_id_application_seq'::regclass),
+  theme character varying(2048),
+  id_company bigint,
+  id_sciency bigint,
+  datefrom date,
+  dateto date,
+  dateatticle date, -- срок подачи статей и докладов
+  datedecision date, -- дата принятия решения
+  "StatusApplication" bigint, -- Статус заявки:...
+  id_user bigint, -- Кто создал заявку
+  CONSTRAINT pk_application PRIMARY KEY (id_application)
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE public.application
+  OWNER TO pi;
+COMMENT ON COLUMN public.application.dateatticle IS 'срок подачи статей и докладов';
+COMMENT ON COLUMN public.application.datedecision IS 'дата принятия решения';
+COMMENT ON COLUMN public.application."StatusApplication" IS 'Статус заявки:
+0 - рассмотрение
+1 - преобразована в конференцию
+2 - отказано в уонференции';
+COMMENT ON COLUMN public.application.id_user IS 'Кто создал заявку';

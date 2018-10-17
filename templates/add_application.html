@@ -1,0 +1,291 @@
+{% extends "BasePage.html" %}
+{% block content %}
+
+    <script type="text/javascript">
+    function validateForm()
+    {
+        var errstr = "", dateto, datefrom, dlinedecision , isvalid;
+        isvalid=true;
+
+        dateto=new Date(document.forms["ed_application"]["date_to"].value);
+        datefrom=new Date(document.forms["ed_application"]["date_from"].value);
+        dlinedecision=new Date(document.forms["ed_application"]["dline_decision"].value);
+
+        if(dateto<datefrom)
+        {
+            isvalid=false;
+            errstr+="Дата начала конференции должна быть раньше даты окончания\n";
+            document.forms["ed_application"]["date_from"].focus();
+        }
+
+        if (dlinedecision<datefrom)
+        {
+            isvalid=false;
+            errstr+="Срок принятия ешения не может быть ранее " +
+                "даты начала конференции\n";
+
+            document.forms["ed_application"]["dline_decision"].focus();
+        }
+
+
+        if (!isvalid) alert(errstr);
+        return isvalid;
+    }
+
+    function chstatus()
+    {
+
+	    var select = document.getElementById("statapp");
+	    var value = select.value;
+
+	    if (value==1) {
+            if (!confirm("вы действительно хотите преобразовать заявку в конференцию?")) {
+                select.value = 0
+            }
+        }
+        else if (value==2)
+            if (!confirm("вы действительно хотите отказать в создании конференцию?")) {
+                select.value = 0
+            }
+
+    }
+    </script>
+
+    <script src={{url_for('static', filename='ckeditor/ckeditor.js') }}></script>
+
+    <div>
+    <form id="ed_application" action="" method="post" onsubmit="return validateForm()" class="ed_application">
+<!--          <center>
+            <fieldset class ="fst" >
+-->            <input hidden value="{{ session.app_id_application }}" id="id_application" type="text" name="id_application">
+
+                    <table id = "edapplicationtable">
+                        {% if session['app_id_application']!=-1 %}
+                            <caption>Изменение данных заявки</caption>
+                        {% else %}
+                            <caption >Новая заявка</caption>
+                        {% endif %}
+                        {% if session['errstr_application']!=""  %}
+                            <caption>{{ session.errstr_application }}</caption>
+                        {% endif %}
+                        <tr>
+                            <td>
+                                <label for="theme">Тема конференции</label>
+                            </td>
+                            <td colspan="3">
+                                <input class="inpapp" autofocus required tabindex="1" id="theme" type="text" name="theme" value="{{ session.app_theme }}"  {{ session.app_disabled }}>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="user_app">Организатор мероприятия</label>
+                            </td>
+                            <td>
+<!--                                <input class="inpapp" value="{{ session.app_username }}" tabindex="1" id="user_app" type="text" name="user_app" title="Лицо, сформировавшее заявку" disabled>
+-->
+
+                                <select class="selapp" tabindex="2" id="user_app" name="user_app" size="1" {{ session.app_disabled }} >
+                                    {% if session.app_id_member==-1 %}
+                                        <option selected value=-1>не указано</option>
+                                    {% else %}
+                                        <option  value=-1>не указано</option>
+                                    {% endif %}
+
+                                    {% for tsc in session.app_members %}
+                                        {% if tsc[0]==session.app_id_member %}
+                                            <option selected value={{ tsc[0] }}>{{ tsc[1] }}</option>
+                                        {% else %}
+                                            <option value={{ tsc[0] }}>{{ tsc[1] }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+
+                            </td>
+
+                            <td>
+                                <label for="comp_app">Организация</label>
+                            </td>
+                            <td>
+<!--                                <input class="inpapp" value="{{ session.company }}" required tabindex="8" id="company" type="text" name="company"  disabled >
+-->
+                                <select class="selapp" tabindex="3" id="comp_app" name="comp_app" size="1" {{ session.app_disabled }} >
+                                    {% if session.app_id_company==-1 %}
+                                        <option selected value=-1>не указано</option>
+                                    {% else %}
+                                        <option  value=-1>не указано</option>
+                                    {% endif %}
+
+                                    {% for tsc in session.app_companies %}
+                                        {% if tsc[0]==session.app_id_company %}
+                                            <option selected value={{ tsc[0] }}>{{ tsc[1] }}</option>
+                                        {% else %}
+                                            <option value={{ tsc[0] }}>{{ tsc[1] }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+
+                            </td>
+
+
+
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="type_sc">Отрасль науки</label>
+                            </td>
+                            <td colspan="3">
+                                <select class="selapp" tabindex="4" id="type_sc" name="type_sc" size="1" {{ session.app_disabled }} >
+                                    {% if session.type_sc==-1 %}
+                                        <option selected value=-1>не указано</option>
+                                    {% else %}
+                                        <option  value=-1>не указано</option>
+                                    {% endif %}
+
+                                    {% for tsc in session.app_types_sc %}
+                                        {% if tsc[0]==session.app_type_sc %}
+                                            <option selected value={{ tsc[0] }}>{{ tsc[1] }}</option>
+                                        {% else %}
+                                            <option value={{ tsc[0] }}>{{ tsc[1] }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </td>
+
+
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="date_from">Период проведения конф. с</label>
+                            </td>
+                            <td>
+                                <input class="inpapp" required tabindex="5" value="{{ session.app_date_from }}" id="date_from" type="date" name="date_from" title="Дата начала конференции" {{ session.app_disabled }}>
+                            </td>
+                            <td>
+                                <label for="date_to">по </label>
+                            </td>
+                            <td>
+                                <input  class="inpapp" value="{{ session.app_date_to }}" required tabindex="6" id="date_to" type="date" name="date_to"  {{ session.app_disabled }}>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="dline_issue">Срок подачи статей и докладов</label>
+                            </td>
+                            <td>
+                                <input class="inpapp" value="{{ session.app_dline_issue }}" required tabindex="7" id="dline_issue" type="date" name="dline_issue" {{ session.app_disabled }} >
+                            </td>
+                            <td>
+                                <label for="dline_decision"> Срок принятия решения <br/>по результатам</label>
+                            </td>
+                            <td>
+                                <input  class="inpapp" value="{{ session.app_dline_decision  }}"  required tabindex="8" id="dline_decision" type="date" name="dline_decision" {{ session.app_disabled }} >
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <label for="moderator">Модератор</label>
+                            </td>
+                            <td>
+                                <select class="selapp" tabindex="9" id="moderator" name="moderator" size="1" {{ session.app_disabled }}>
+                                    {% if session.app_id_mod==-1 %}
+                                        <option selected value=-1>не указано</option>
+                                    {% else %}
+                                        <option  value=-1>не указано</option>
+                                    {% endif %}
+
+                                    {% for tsc in session.app_members %}
+                                        {% if tsc[0]==session.app_id_mod %}
+                                            <option selected value={{ tsc[0] }}>{{ tsc[1] }}</option>
+                                        {% else %}
+                                            <option value={{ tsc[0] }}>{{ tsc[1] }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td>
+                                <label for="statapp"> Статус заявки </label>
+                            </td>
+                            <td>
+                                <select class="selapp" tabindex="10" id="statapp" name="statapp" size="1" onchange="chstatus()" {{ session.app_disabled }}>
+                                    {% if session.app_statapp==-1 %}
+                                        <option selected value=-1>не указано</option>
+                                    {% else %}
+                                        <option  value=-1>не указано</option>
+                                    {% endif %}
+
+                                    {% for tsc in session.app_statapps %}
+                                        {% if tsc[0]==session.app_statapp %}
+                                            <option selected value={{ tsc[0] }}>{{ tsc[1] }}</option>
+                                        {% else %}
+                                            <option value={{ tsc[0] }}>{{ tsc[1] }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </td>
+                        </tr>
+
+
+
+                        <tr class="rowcenter">
+                            <td colspan="4">
+                                <label for="descr_konf"> <br/> <b> Описание мероприятия, требования к публикуемым материалам </b> </label>
+                            </td>
+
+                        </tr>
+
+
+
+                        <tr class="rowcenter">
+                            <td colspan="4" >
+                                 <textarea  id="descr_konf"  tabindex="11"  cols="80" rows="10" name="descr_konf" {{ session.app_disabled }} >
+                                     {{ session.app_descr_konf }}
+                                 </textarea>
+                            </td>
+                        </tr>
+
+
+                        <tr class="rowcenter">
+                            <td colspan="4">
+                                <label for="orgcom"> <br/><b>Оргкомитет</b> </label>
+                            </td>
+
+                        </tr>
+
+                        <tr class="rowcenter">
+                            <td colspan="4">
+
+                                 <textarea  id="orgcom"  tabindex="12" cols="80" rows="10" name="orgcom" {{ session.app_disabled }}>
+                                     {{ session.app_orgcom }}
+                                 </textarea>
+                            </td>
+                        </tr>
+                            <tr class="rowcenter">
+                                <td colspan="2" >
+                                    <input type="submit" tabindex="13" value="Сохранить" name="subapp" {{ session.app_disabled }}>
+                                </td>
+
+                                <td colspan="2" >
+                                     <input type="button" tabindex="14" value="Отмена" name="break" onclick="location.href='javascript:history.go(-1)' ">
+                                </td>
+
+                            </tr>
+
+
+                    </table>
+
+
+<!--
+            </fieldset>
+<!--         </center>
+-->
+        </form>
+     <script>
+
+         CKEDITOR.replace( 'descr_konf' );
+         CKEDITOR.replace( 'orgcom' );
+
+     </script>
+
+    </div>
+{% endblock %}

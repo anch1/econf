@@ -1,0 +1,4 @@
+                                            (% if session['userlist_nompage'] == pg %}
+                                                <a class='currentpage' href='/userlist/page/{{ pg}}'>{{ pg }}</a>
+                                            {% else %}
+                                            {% endif %}
