@@ -542,5 +542,57 @@ def app_may_delete(id_app:int, curs) -> bool:
     return res;
 
 
+#**********************************
+
+@app.route('/conflist/<int:nompage>')
+def conflist(nompage:int):
+
+    au = session.get('is_auth', False)
+    if (not au):
+        return redirect("/login/")
+    session['cflist_nompage'] = nompage
+
+    # ***********************
+    #                       0             1        2                3                 4       5          6                              7                             8
+    sqlstr = "select id_conf, theme, comp.name company, sc.name scname, to_char(datefrom, 'dd.mm.yyyy'), to_char(dateto,'dd.mm.yyyy'), statusconf, to_char(dateatticle,'dd.mm.yyyy')  " + \
+             "from conf a left outer join dict comp on (comp.dict_name='орг' and comp.id_dict=a.id_company) " + \
+             "left outer join dict sc on (sc.dict_name='онаук' and sc.id_dict=a.id_sciency) " + \
+             "where (a.deleted<>'Д' or a.deleted is null) " + \
+             "order by datefrom, theme limit " + \
+             str(app.lenthuserlistpage) + " offset " + str((session['cflist_nompage'] - 1) * app.lenthuserlistpage)
+
+    conn = psycopg2.connect(host=app.config['HOSTDATABASE'], user=app.config['USERNAME'],
+                            password=app.config['PASSWORD'], dbname=app.config['DBNAME'])
+    cursor = conn.cursor()
+
+    cursor.execute(sqlstr)
+
+    session.cflist = cursor.fetchall()
+
+    cursor.execute("select count(*) from conf where (deleted<>'Д' or deleted is null)")
+    amountrec = cursor.fetchall()[0][0]
+
+    maxpage = (amountrec // app.lenthuserlistpage) + 1
+
+    cflist_minpage = nompage - 5
+    if (cflist_minpage < 1):
+        cflist_minpage = 1
+
+    cflist_maxpage = nompage + 5
+    if (cflist_maxpage > maxpage):
+        cflist_maxpage = maxpage
+
+    session['nmcfpages'] = []
+    session['maxcfpages'] = cflist_maxpage
+    for i in range(cflist_minpage, cflist_maxpage + 1):
+        session['nmcfpages'].append(i)
+
+    conn.close()
+    return render_template('cflist.html', ver=app.version)
+
+
+
+#**********************************
+
 if __name__ == '__main__':
     app.run()

@@ -47,47 +47,47 @@
                                 <td colspan="6">
                                     <div class="pagerow">
 
-                                        {% if (session['zlist_nompage']==1) %}
-                                            <a class='nextprew' href='/zlist/1'>Пред</a>
+                                        {% if (session['cflist_nompage']==1) %}
+                                            <a class='nextprew' href='/conflist/1'>Пред</a>
                                         {% else %}
-                                            <a class='nextprew' href='/zlist/{{ session.zlist_nompage-1 }}'>Пред</a>
+                                            <a class='nextprew' href='/conflist/{{ session.cflist_nompage-1 }}'>Пред</a>
                                         {% endif %}
 
                                         {% for pg in session['nmzpages'] %}
-                                            {% if pg!=session['zlist_nompage'] %}
-                                                <a class='page' href='/zlist/{{ pg}}'>{{ pg }}</a>
+                                            {% if pg!=session['cflist_nompage'] %}
+                                                <a class='page' href='/conflist/{{ pg}}'>{{ pg }}</a>
                                             {% else %}
-                                                <a class="currentpage" href='/zlist/{{ pg}}'>{{ pg }}</a>
+                                                <a class="currentpage" href='/conflist/{{ pg}}'>{{ pg }}</a>
                                             {% endif %}
 
                                         {% endfor %}
 
-                                        <a class='nextprew' href='/zlist/{%if session.zlist_nompage>=session.maxzpages%}{{session.maxzpages}}{% else %}{{ session.zlist_nompage+1}}{%endif%}'>След</a>
+                                        <a class='nextprew' href='/conflist/{%if session.cflist_nompage>=session.maxzpages%}{{session.maxzpages}}{% else %}{{ session.cflist_nompage+1}}{%endif%}'>След</a>
                                     </div>
                                 </td>
                                 </tr>
                             </tfoot>
 
-                            {% for s in session.zlist %}
+                            {% for s in session.cflist %}
                                 <tr>
                                     <td>
-                                         <a href='/edit_z/{{ s[0]}}'>{{ s[1] }}</a> <!-- тема -->
+                                         <a href='/edit_c/{{ s[0]}}'>{{ s[1] }}</a> <!-- тема -->
                                     </td>
                                     <td>
-                                        <a href='/edit_z/{{ s[0]}}'>{{ s[2] }}</a>   <!-- организация -->
+                                        <a href='/edit_c/{{ s[0]}}'>{{ s[2] }}</a>   <!-- организация -->
                                     </td>
 
                                     <td>
-                                        <a href='/edit_z/{{ s[0]}}'>c {{ s[4] }} по {{ s[5] }}</a>   <!--!compname -->
+                                        <a href='/edit_c/{{ s[0]}}'>c {{ s[4] }} по {{ s[5] }}</a>   <!--!compname -->
                                     </td>
                                     <td>
-                                        <a href='/edit_z/{{ s[0]}}'>{{ s[8] }}</a>   <!-- дата подачи статей-->
+                                        <a href='/edit_c/{{ s[0]}}'>{{ s[8] }}</a>   <!-- дата подачи статей-->
                                     </td>
                                     <td>
-                                        <a href='/edit_z/{{ s[0]}}'>{{ s[7] }}</a>  <!-- конт лицо-->
+                                        <a href='/edit_c/{{ s[0]}}'>{{ s[7] }}</a>  <!-- конт лицо-->
                                     </td>
                                     <td>
-                                        <a href='/deletez/{{ s[0]}}' onclick='return accept_onclick()'>Удалить</a>
+                                        <a href='/deletec/{{ s[0]}}' onclick='return accept_onclick()'>Удалить</a>
                                     </td>
 
                                 </tr>
