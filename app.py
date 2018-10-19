@@ -298,7 +298,8 @@ def zlist(nompage):
     sqlstr = "select id_application, theme, comp.name company, sc.name scname, to_char(datefrom, 'dd.mm.yyyy'), to_char(dateto,'dd.mm.yyyy'), statusapplication, m.name||' '||m.surname||' '||m.famely usr, to_char(dateatticle,'dd.mm.yyyy')  " + \
              "from application a left outer join dict comp on (comp.dict_name='орг' and comp.id_dict=a.id_company) " + \
              "left outer join dict sc on (sc.dict_name='онаук' and sc.id_dict=a.id_sciency), members m " + \
-             "where (a.deleted<>'Д' or a.deleted is null) and m.id_member=a.id_member " + \
+             "where (a.deleted<>'Д' or a.deleted is null) and m.id_member=a.id_member and statusapplication in (0,2) " + \
+             "and m.id_member ="+str(session['id_member'])+ \
              "order by datefrom, theme limit " + \
              str(app.lenthuserlistpage) + " offset " + str((session['zlist_nompage'] - 1) * app.lenthuserlistpage)
 
@@ -339,36 +340,6 @@ def zlist(nompage):
 def addapplication():
     return edit_application(-1)
 
-
-@app.route('/remadd_application/', methods=['POST'])
-def addapplicationpost():
-    session['errorstr'] = ""
-    session['app_id_application'] = request.form['id_application']
-    session['app_theme'] = request.form['theme']
-    session['app_id_company'] = request.form['comp_app']
-    session['app_id_member'] = request.form['user_app']
-
-    session['app_type_sc'] = request.form['type_sc']
-    session['app_date_from'] = request.form['date_from']
-    session['app_date_to'] = request.form['date_to']
-
-    session['app_dline_issue'] = request.form['dline_issue']
-    session['app_dline_decision'] = request.form['dline_decision']
-
-    session['app_descr_konf'] = request.form['descr_konf']
-    session['orgcom'] = request.form['orgcom']
-
-    # дополнительная проверка дат на случай отключенных JS
-    td_from = date(session['app_date_from'])
-
-    conn = psycopg2.connect(host=app.config['HOSTDATABASE'], user=app.config['USERNAME'],
-                            password=app.config['PASSWORD'], dbname=app.config['DBNAME'])
-    cursor = conn.cursor()
-    cursor.execute(" select count(*) from members where login=%s and id_member<>%s",
-                   (request.form['lgn'], request.form['id_member'],))
-    conn.close()
-
-    return render_template('add_application.html', ver=app.version)
 
 
 @app.route('/edit_z/<int:id_application>', methods=['GET', 'POST'])
@@ -418,6 +389,7 @@ def edit_application(id_application):
 
                     ))
                 conn.commit()
+
 
 
         except Exception:
@@ -554,10 +526,11 @@ def conflist(nompage:int):
 
     # ***********************
     #                       0             1        2                3                 4       5          6                              7                             8
-    sqlstr = "select id_conf, theme, comp.name company, sc.name scname, to_char(datefrom, 'dd.mm.yyyy'), to_char(dateto,'dd.mm.yyyy'), statusconf, to_char(dateatticle,'dd.mm.yyyy')  " + \
-             "from conf a left outer join dict comp on (comp.dict_name='орг' and comp.id_dict=a.id_company) " + \
-             "left outer join dict sc on (sc.dict_name='онаук' and sc.id_dict=a.id_sciency) " + \
-             "where (a.deleted<>'Д' or a.deleted is null) " + \
+    sqlstr = "select id_application, theme, comp.name company, sc.name scname, to_char(datefrom, 'dd.mm.yyyy'), to_char(dateto,'dd.mm.yyyy'), statusapplication, m.name||' '||m.surname||' '||m.famely usr, to_char(dateatticle,'dd.mm.yyyy')  " + \
+             "from application a left outer join dict comp on (comp.dict_name='орг' and comp.id_dict=a.id_company) " + \
+             "left outer join dict sc on (sc.dict_name='онаук' and sc.id_dict=a.id_sciency), members m " + \
+             "where (a.deleted<>'Д' or a.deleted is null) and m.id_member=a.id_member and statusapplication in (1,3,4,5,6) " + \
+             "and m.id_member ="+str(session['id_member']) + \
              "order by datefrom, theme limit " + \
              str(app.lenthuserlistpage) + " offset " + str((session['cflist_nompage'] - 1) * app.lenthuserlistpage)
 
@@ -569,7 +542,7 @@ def conflist(nompage:int):
 
     session.cflist = cursor.fetchall()
 
-    cursor.execute("select count(*) from conf where (deleted<>'Д' or deleted is null)")
+    cursor.execute("select count(*) from application where (deleted<>'Д' or deleted is null)")
     amountrec = cursor.fetchall()[0][0]
 
     maxpage = (amountrec // app.lenthuserlistpage) + 1
