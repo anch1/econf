@@ -564,6 +564,50 @@ def conflist(nompage:int):
     return render_template('cflist.html', ver=app.version)
 
 
+@app.route('/listissue/<int:nompage>')
+def listissue(nompage):
+
+    session['islist_nompage'] = nompage
+
+    # ***********************
+    #                       0             1        2                3                 4       5          6                              7                             8
+    idconf=session.get('id_application',-1)
+    sqlstr = "select id_issue, i.name, i.author, to_char(i.date_create, 'dd.mm.yyyy'), to_char(i.date_load, 'dd.mm.yyyy'), m.name||' '||m.surname||' '||m.famely loader, i.statusissue " + \
+             "from issue i, members m " + \
+             "where (i.deleted<>'Д' or i.deleted is null) and m.id_member=i.id_member_ldr and id_application="  + str(idconf)+\
+             "order by name limit " + \
+             str(app.lenthuserlistpage) + " offset " + str((session['islist_nompage'] - 1) * app.lenthuserlistpage)
+
+    conn = psycopg2.connect(host=app.config['HOSTDATABASE'], user=app.config['USERNAME'],
+                            password=app.config['PASSWORD'], dbname=app.config['DBNAME'])
+    cursor = conn.cursor()
+
+    cursor.execute(sqlstr)
+
+    session.cflist = cursor.fetchall()
+
+    cursor.execute("select count(*) from issue where (deleted<>'Д' or deleted is null) and id_application="  + str(idconf))
+    amountrec = cursor.fetchall()[0][0]
+
+    maxpage = (amountrec // app.lenthuserlistpage) + 1
+
+    cflist_minpage = nompage - 5
+    if (cflist_minpage < 1):
+        cflist_minpage = 1
+
+    cflist_maxpage = nompage + 5
+    if (cflist_maxpage > maxpage):
+        cflist_maxpage = maxpage
+
+    session['nmcfpages'] = []
+    session['maxcfpages'] = cflist_maxpage
+    for i in range(cflist_minpage, cflist_maxpage + 1):
+        session['nmcfpages'].append(i)
+
+    conn.close()
+    return render_template('listissue.html', ver=app.version)
+
+
 
 #**********************************
 

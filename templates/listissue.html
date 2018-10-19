@@ -19,7 +19,7 @@
                     <input hidden value="{{ session.id_conf }}" id="id_conf" type="text" name="id_conf">
 
                     <table id = "cflisttable">
-                        <caption>Список публикаций конференции <br/> <a href="/add_issue/" >Добавить публикацию</a> </caption>
+                        <caption>Список публикаций конференции <br/> <a href="/add_issue/-1" >Добавить публикацию</a> </caption>
 
                             <tr>
                                 <th>
@@ -44,7 +44,7 @@
                                         {% if (session['islist_nompage']==1) %}
                                             <a class='nextprew' href='/islist/1'>Пред</a>
                                         {% else %}
-                                            <a class='nextprew' href='/islist/{{ session.cflist_nompage-1 }}'>Пред</a>
+                                            <a class='nextprew' href='/islist/{{ session.islist_nompage-1 }}'>Пред</a>
                                         {% endif %}
 
                                         {% for pg in session['nmispages'] %}
@@ -56,7 +56,7 @@
 
                                         {% endfor %}
 
-                                        <a class='nextprew' href='/islist/{%if session.cflist_nompage>=session.maxzpages%}{{session.maxzpages}}{% else %}{{ session.cflist_nompage+1}}{%endif%}'>След</a>
+                                        <a class='nextprew' href='/islist/{%if session.islist_nompage>=session.maxzpages%}{{session.maxzpages}}{% else %}{{ session.islist_nompage+1}}{%endif%}'>След</a>
                                     </div>
                                 </td>
                                 </tr>
