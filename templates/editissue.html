@@ -7,47 +7,21 @@
         var errstr = "", dateto, datefrom, dlinedecision , isvalid;
         isvalid=true;
 
-        dateto=new Date(document.forms["ed_application"]["date_to"].value);
-        datefrom=new Date(document.forms["ed_application"]["date_from"].value);
+        dateCreate=new Date(document.forms["ed_application"]["date_to"].value);
+        dateLoad=new Date(document.forms["ed_application"]["date_from"].value);
         dlinedecision=new Date(document.forms["ed_application"]["dline_decision"].value);
 
-        if(dateto<datefrom)
+        if(dateLoad<dateCreate)
         {
             isvalid=false;
-            errstr+="Дата начала конференции должна быть раньше даты окончания\n";
+            errstr+="Дата первой публикации не может быть больше даты загрузки\n";
             document.forms["ed_application"]["date_from"].focus();
         }
 
-        if (dlinedecision<datefrom)
-        {
-            isvalid=false;
-            errstr+="Срок принятия ешения не может быть ранее " +
-                "даты начала конференции\n";
-
-            document.forms["ed_application"]["dline_decision"].focus();
-        }
 
 
         if (!isvalid) alert(errstr);
         return isvalid;
-    }
-
-    function chstatus()
-    {
-
-	    var select = document.getElementById("statapp");
-	    var value = select.value;
-
-	    if (value==1) {
-            if (!confirm("вы действительно хотите преобразовать заявку в конференцию?")) {
-                select.value = 0
-            }
-        }
-        else if (value==2)
-            if (!confirm("вы действительно хотите отказать в создании конференцию?")) {
-                select.value = 0
-            }
-
     }
     </script>
 
@@ -59,7 +33,7 @@
             <fieldset class ="fst" >
 -->            <input hidden value="{{ session.iss_id_issue }}" id="id_issue" type="text" name="id_issue">
 
-                    <table id = "loadissue">
+                    <table id = "editissue">
                         <caption >Редактирование публикации</caption>
                         {% if session['errstr_loadissue']!=""  %}
                             <caption>{{ session.errstr_loadissue }}</caption>
@@ -69,32 +43,94 @@
                                 <label for="date_create">Дата публикации</label>
                             </td>
                             <td>
-                                <input class="inpis" required tabindex="5" value="{{ session.app_date_from }}" id="date_create" type="date" name="date_create" title="дата первой публикации работы" {{ session.is_disabled }}>
+                                <input class="inpis" autofocus required tabindex="5" value="{{ session.is_date_create }}" id="date_create" type="date" name="date_create" title="дата первой публикации работы" {{ session.is_disabled }}>
                             </td>
                             <td>
                                 <label for="date_load">дата загрузки</label>
                             </td>
                             <td>
-                                <input  class="inpis" value="{{ session.is_date_load }}" required tabindex="6" id="date_load" type="date" name="date_load"  {{ session.app_disabled }}>
+                                <input  class="inpis" value="{{ session.is_date_load }}" required tabindex="6" id="date_load" type="date" name="date_load"  {{ session.is_disabled }}>
                             </td>
                         </tr>
+                        <tr>
+                            <td>
+                                <label for="name_issue">Название публикации</label>
+                            </td>
+                            <td>
+                                <input class="inpis" required tabindex="5" value="{{ session.is_name }}" id="name_issue" type="text" name="name_issue" {{ session.is_disabled }}>
+                            </td>
+                            <td>
+                                <label for="is_authors">Автор/авторы</label>
+                            </td>
+                            <td>
+                                <input  class="inpis" value="{{ session.is_authors }}" required tabindex="6" id="is_authors" type="text" name="is_authors"  {{ session.is_disabled }}>
+                            </td>
+                        </tr>
+
+                        <tr class="rowcenter">
+                            <td colspan="4">
+                                <label for="is_ann_rus">Аннотация на русском языке</label>
+                            </td>
+                        </tr>
+                        <tr class="rowcenter">
+                            <td colspan="4" >
+                                 <textarea  id="is_ann_rus"  tabindex="11"  cols="80" rows="10" name="is_ann_rus" {{ session.is_disabled }} >
+                                     {{ session.is_ann_rus }}
+                                 </textarea>
+                            </td>
+                        </tr>
+
+                        <tr class="rowcenter" >
+                            <td colspan="4">
+                                <label for="is_ann_eng">Аннотация на английском языке</label>
+                            </td>
+                        </tr>
+                        <tr class="rowcenter" >
+                            <td colspan="4" >
+                                 <textarea  id="is_ann_eng"  tabindex="11"  cols="80" rows="10" name="is_ann_eng" {{ session.is_disabled }} >
+                                     {{ session.is_ann_eng }}
+                                 </textarea>
+                            </td>
+                        </tr>
+
+
+                        <tr>
+                            <td>
+                                <label for="is_tags_rus">Ключевые слова(рус)</label>
+                            </td>
+                            <td>
+                                <input class="inpis" required tabindex="5" value="{{ session.is_tags_rus }}" id="is_tags_rus" type="text" name="is_tags_rus" {{ session.is_disabled }}>
+                            </td>
+                            <td>
+                                <label for="is_udk">Ключевые слова(eng)</label>
+                            </td>
+                            <td>
+                                <input  class="inpis" value="{{ session.is_udk }}" required tabindex="6" id="is_udk" type="text" name="is_udk"  {{ session.is_disabled }}>
+                            </td>
+                        </tr>
+
+
                         <tr>
                             <td>
                                 <label for="inpfile">Укажите файл для загрузки</label>
                             </td>
                             <td >
-                                 <input class="inpfile" autofocus required tabindex="1" id="inpfile" type="file" name="inpfile"  >
+                                 <input class="inpfile" required tabindex="1" id="inpfile" type="file" name="inpfile"  >
                             </td>
                         </tr>
+
+
+
                         <tr class="rowcenter">
                             <td colspan="2" >
-                                <input type="submit" tabindex="13" value="Отправить" name="subapp" {{ session.app_disabled }}>
+                                <input type="submit" tabindex="13" value="Отправить" name="subapp" {{ session.is_disabled }}>
                             </td>
 
                             <td colspan="2" >
                                  <input type="button" tabindex="14" value="Отмена" name="break" onclick="location.href='javascript:history.go(-1)' ">
                             </td>
                         </tr>
+
 
 
                     </table>

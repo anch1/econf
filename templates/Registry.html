@@ -64,14 +64,14 @@
                                     <label for="lgn">Логин</label>
                                 </td>
                                 <td>
-                                    <input class="inpreg" value="{{ session.lgn }}" autofocus required tabindex="1" id="lgn" type="text" name="lgn" size="15" placeholder="Строка для входа на сайт" title="Строка для входа на сайт">
+                                    <input class="inpreg" value="{{ session.lgn }}" autofocus required tabindex="1" id="lgn" type="text" name="lgn"  placeholder="Строка для входа на сайт" title="Строка для входа на сайт">
                                 </td>
 
                                 <td>
                                     <label for="bd">Дата рождения</label>
                                 </td>
                                 <td>
-                                    <input class="inpreg" value="{{ session.bd }}" required tabindex="8" id="bd" type="date" name="bd" size="15"><br/>
+                                    <input class="inpbd" value="{{ session.bd }}" required tabindex="8" id="bd" type="date" name="bd"><br/>
                                 </td>
 
 
@@ -82,7 +82,7 @@
                                     <label for="pwd">Пароль</label>
                                 </td>
                                 <td>
-                                    <input required class="inpreg" tabindex="2" id="pwd" type="password" name="pwd" size="15" placeholder="Не менее 6 символов" title="Не менее 6 символов">
+                                    <input required class="inpreg" tabindex="2" id="pwd" type="password" name="pwd" placeholder="Не менее 6 символов" title="Не менее 6 символов">
                                 </td>
 
                                 <td>
@@ -106,13 +106,13 @@
                                     <label for="conf_pwd">Подтв. пароля</label>
                                 </td>
                                 <td>
-                                    <input required class="inpreg" tabindex="3" id="conf_pwd" type="password" name="conf_pwd" size="15" placeholder="Должен совпадать с паролем" title="должен совпадать с паролем">
+                                    <input required class="inpreg" tabindex="3" id="conf_pwd" type="password" name="conf_pwd"  placeholder="Должен совпадать с паролем" title="должен совпадать с паролем">
                                 </td>
                                 <td>
                                     <label for="em">Эл.почта</label>
                                 </td>
                                 <td>
-                                    <input  class="inpreg" value="{{ session.em }}" required tabindex="10" id="em" type="email" name="em" size="15" >
+                                    <input  class="inpreg" value="{{ session.em }}" required tabindex="10" id="em" type="email" name="em"  >
                                 </td>
                             </tr>
                             <tr>
@@ -120,13 +120,13 @@
                                     <label for="fml">Фамилия</label>
                                 </td>
                                 <td>
-                                    <input class="inpreg" value="{{ session.fml }}" required tabindex="4" id="fml" type="text" name="fml" size="15" >
+                                    <input class="inpreg" value="{{ session.fml }}" required tabindex="4" id="fml" type="text" name="fml"  >
                                 </td>
                                 <td>
                                     <label for="ph">Телефон</label>
                                 </td>
                                 <td>
-                                    <input  class="inpreg" value="{{ session.ph  }}" title="Формат +X(XXX)XXX-XX-XX" required tabindex="11" id="ph" type="text" name="ph" pattern="\+{0,1}\d\([0-9]{3}\)[0-9]{3}-[0-9]{2}-[0-9]{2}" size="15" placeholder="+7(XXX)XXX-XX-XX">
+                                    <input  class="inpreg" value="{{ session.ph  }}" title="Формат +X(XXX)XXX-XX-XX" required tabindex="11" id="ph" type="text" name="ph" pattern="\+{0,1}\d\([0-9]{3}\)[0-9]{3}-[0-9]{2}-[0-9]{2}"  placeholder="+7(XXX)XXX-XX-XX">
                                 </td>
                             </tr>
                             <tr>
@@ -134,7 +134,7 @@
                                     <label for="nm">Имя</label>
                                 </td>
                                 <td>
-                                    <input class="inpreg" value ="{{ session.nm }}" required tabindex="5" id="nm" type="text" name="nm" size="15" >
+                                    <input class="inpreg" value ="{{ session.nm }}" required tabindex="5" id="nm" type="text" name="nm"  >
                                 </td>
 
                                 <td>
@@ -163,7 +163,7 @@
                                     <label for="sn">Отчество</label>
                                 </td>
                                 <td>
-                                    <input class="inpreg" value="{{ session.sn }}"required tabindex="6" id="sn" type="text" name="sn" size="15">
+                                    <input class="inpreg" value="{{ session.sn }}"required tabindex="6" id="sn" type="text" name="sn" >
                                 </td>
                                 <td>
                                     <label for="dlgn">Должность </label>
@@ -190,10 +190,10 @@
                             </tr>
                             <tr>
                                 <td>
-                                    <label for="adr">Проживание (нас.пункт)</label>
+                                    <label for="adr">Проживание <br/> (нас.пункт)</label>
                                 </td>
                                 <td>
-                                    <input class="inpreg" value="{{ session.adr }}" required tabindex="7" id="adr" type="text" name="adr" size="15">
+                                    <input class="inpreg" value="{{ session.adr }}" required tabindex="7" id="adr" type="text" name="adr" >
                                 </td>
                                 <td>
                                     <label for="uzv">Уч. звание</label>

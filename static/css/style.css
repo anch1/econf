@@ -1,7 +1,9 @@
 /* Главная менюшечка */
 body    {
+            height:100%;
             background-color: whitesmoke;
-            min-width:1024px;
+            width:100%;
+/*            min-width:1024px;*/
 
         }
 .header {
@@ -26,7 +28,7 @@ body    {
             margin:5px;
             padding:10px;
             float:left;
-            width:130px;
+            width:120px;
             border: 1px solid black;
             border-radius: 10px;
         }
@@ -39,16 +41,22 @@ body    {
 
         }
 .conteyner{
+            width:100%;
+            min-width: 700px;
             position: relative;
-            min-height:340px;
+/*            min-height:340px;
+            height:100%;*/
+    border: 1px solid black;
+            float:left;
+
 }
 
 .left-box{
-            margin-top:20px;
+            margin-top:7px;
             margin-left:0px;
+            margin-right:0px;
             padding: 10px;
             width:200px;
-            min-height:300px;
             background-color: azure;
             border: 1px solid black;
             border-radius: 10px;
@@ -65,13 +73,11 @@ body    {
 
 
 .content-box{
-            margin-top:20px;
-            margin-left:20px;
+            margin-top:7px;
+            margin-left:7px;
             padding: 10px;
-/*            width:900px;*/
-            width:calc(100% - 264px);
-            min-width:200px;
-            min-height:300px;
+            width:calc(100% - 280px);
+            min-width: 400px;
             background-color: azure;
             border: 1px solid black;
             border-radius: 10px;
@@ -83,7 +89,7 @@ body    {
 .foot   {
             width: auto;
 
-            margin-top:20px;
+            margin-top:7px;
             padding: 10px;
             background-color: azure;
             border:  1px solid black;
@@ -106,24 +112,35 @@ body    {
 table caption{
     text-align: center;
     font-size:large;
-    margin: 10px;
+    margin: 4px;
 }
 
-#add_info{width:100%;
+/*#add_info{width:100%;
 }
+*/
 #logtable,#regtable , #edapplicationtable  {
-            border-spacing:10px 10px;
+            border-spacing:4px 4px;
+            width:calc(100% - 0px);
+
+            border: 1px solid black;
         }
+
 
 #bd{height: 1ex;}
 
 .selreg{
-    width:23ex;
+/*    width:23ex;*/
+    width:calc(100% - 0px);
+
 }
 .inpreg{
-    width:20ex;
+/*    width:20ex;*/
+    width:calc(100% - 19px);
 }
 
+.inpbd{
+    width:calc(100% - 19px);
+}
 
 
 .currentpage{
@@ -138,8 +155,11 @@ table caption{
     margin-right: 4ex;
 }
 #ulisttable, #zlisttable{
+    border: 1px solid black;
     text-align: left;
-    border-spacing:30px 10px;
+    border-spacing:4px 4px;
+    width: 96%;
+
 }
 /*Добавление заявки*/
 .rowcenter{text-align: center;}
@@ -147,6 +167,10 @@ table caption{
     height: 1ex;
 
 }
+.headulist{
+
+}
+/*
 #theme{
     width:96%;
 
@@ -160,76 +184,9 @@ table caption{
 .selapp{
     width:23ex;
 }
+*/
 .backbutton
 {
     text-align: center;
 }
 
-/* цвет текущей страницы в списке страниц */
-/*
-.top-menu {
-margin: 0 60px;
-position: relative;
-background: #5A394E;
-box-shadow:
-inset 1px 0 0 rgba(255,255,255,.1),
-inset -1px 0 0 rgba(255,255,255,.1),
-inset 150px 0 150px -150px rgba(255,255,255,.12),
-inset -150px 0 150px -150px rgba(255,255,255,.12);
-}
-
-.menu-main {
-list-style: none;
-padding: 0;
-margin: 0;
-text-align: center;
-}
-
-.menu-main li {
-display: inline-block;
-margin-right: -4px;
-}
-.menu-main a {
-text-decoration: none;
-display: inline-block;
-padding: 15px 30px;
-font-family: 'PT Sans Caption', sans-serif;
-color: white;
-transition: .3s linear;
-}
-
-.menu-main a.current,
-.menu-main a:hover {background: rgba(0,0,0,.2);}
-@media (max-width: 680px) {
-.top-menu {margin: 0;}
-.menu-main li {
-display: block;
-margin-right: 0;
-}
-.menu-main:before,
-.menu-main:after {content: none;}
-.menu-main a {display: block;}
-}
-
-
-.f1 {
-  background-color: whitesmoke;)
-  padding: 5px 25px;
-  margin: 0;
-  color: blue;
-}
-.fst{
-    margin:                                                                                                     ;: 0 auto;
-  background-color: red;
-  width: 280px;
-}
-
-.invate{
-text-align: center;
-}
-.btns{
-  text-align: center;
-  style: "float: left; margin-right: 3px";
-}
-
-*/

@@ -233,7 +233,7 @@ def userlist(nompage):
     au = session.get('is_auth', False)  # type: Union[bool, Any]
     if (not au):
         return redirect("/login/")
-    if session['usrr'][0]!='1':
+    if session['usrr'][0] != '1':
         return redirect("/")
 
     session['userlist_nompage'] = nompage
@@ -299,7 +299,7 @@ def zlist(nompage):
              "from application a left outer join dict comp on (comp.dict_name='орг' and comp.id_dict=a.id_company) " + \
              "left outer join dict sc on (sc.dict_name='онаук' and sc.id_dict=a.id_sciency), members m " + \
              "where (a.deleted<>'Д' or a.deleted is null) and m.id_member=a.id_member and statusapplication in (0,2) " + \
-             "and m.id_member ="+str(session['id_member'])+ \
+             "and m.id_member =" + str(session['id_member']) + \
              "order by datefrom, theme limit " + \
              str(app.lenthuserlistpage) + " offset " + str((session['zlist_nompage'] - 1) * app.lenthuserlistpage)
 
@@ -341,7 +341,6 @@ def addapplication():
     return edit_application(-1)
 
 
-
 @app.route('/edit_z/<int:id_application>', methods=['GET', 'POST'])
 def edit_application(id_application):
     au = session.get('is_auth', False)
@@ -373,21 +372,21 @@ def edit_application(id_application):
                 conn.commit()
                 res = cursor.fetchall()
             else:
-                sqlstr="update application set theme=%s, id_company=%s, id_sciency=%s, datefrom=%s, dateto=%s, dateatticle=%s, datedecision=%s, id_member=%s, describe_conf=%s,orgcom_conf=%s , statusapplication=%s , id_moderator=%s" + \
-                    "where id_application="+str(session['app_id_application'])
+                sqlstr = "update application set theme=%s, id_company=%s, id_sciency=%s, datefrom=%s, dateto=%s, dateatticle=%s, datedecision=%s, id_member=%s, describe_conf=%s,orgcom_conf=%s , statusapplication=%s , id_moderator=%s" + \
+                         "where id_application=" + str(session['app_id_application'])
                 cursor.execute(sqlstr,
-                    (
-                        request.form['theme'], request.form['comp_app'], request.form['type_sc'],
+                               (
+                                   request.form['theme'], request.form['comp_app'], request.form['type_sc'],
 
-                        request.form['date_from'],
-                        request.form['date_to'], request.form['dline_issue'], request.form['dline_decision'],
-                        request.form['user_app'],
-                        request.form['descr_konf'],
-                        request.form['orgcom'],
-                        request.form['statapp'],
-                        request.form['moderator'],
+                                   request.form['date_from'],
+                                   request.form['date_to'], request.form['dline_issue'], request.form['dline_decision'],
+                                   request.form['user_app'],
+                                   request.form['descr_konf'],
+                                   request.form['orgcom'],
+                                   request.form['statapp'],
+                                   request.form['moderator'],
 
-                    ))
+                               ))
                 conn.commit()
 
 
@@ -414,12 +413,9 @@ def edit_application(id_application):
         cursor.execute("select id_dict,name from dict where dict_name='рнаук' order by name")
         session.app_types_sc = cursor.fetchall()
 
-
-#
-        session['app_statapps']=[[0,'на рассмотрении'],[1,'одобрена'],[2,'отказано']]
-#
-
-
+        #
+        session['app_statapps'] = [[0, 'на рассмотрении'], [1, 'одобрена'], [2, 'отказано']]
+        #
 
         if (id_application == -1):
             session['app_id_application'] = '-1'
@@ -461,11 +457,10 @@ def edit_application(id_application):
             session['app_statapp'] = res_app[0][12]
             session['app_id_mod'] = res_app[0][13]
 
-            if session['app_statapp']>=1:
-                session['app_disabled']='disabled'
+            if session['app_statapp'] >= 1:
+                session['app_disabled'] = 'disabled'
             else:
-                session['app_disabled']=''
-
+                session['app_disabled'] = ''
 
         conn.close()
         return render_template('add_application.html', ver=app.version)
@@ -483,30 +478,30 @@ def write_profil():
 
 @app.route('/deletez/<int:id_application>', methods=['GET', 'POST'])
 def delete_app(id_application: int):
-
     conn = psycopg2.connect(host=app.config['HOSTDATABASE'], user=app.config['USERNAME'],
                             password=app.config['PASSWORD'], dbname=app.config['DBNAME'])
 
     cursor = conn.cursor()
-    if app_may_delete(id_application,cursor):
-        cursor.execute("delete from application where id_application="+str(id_application))
+    if app_may_delete(id_application, cursor):
+        cursor.execute("delete from application where id_application=" + str(id_application))
         conn.commit()
         conn.close()
-        return render_template('message.html', ver=app.version, message='Заявка "' + session['app_theme'] + '" Удалена', urlret='location.href="/zlist/1" ')
+        return render_template('message.html', ver=app.version, message='Заявка "' + session['app_theme'] + '" Удалена',
+                               urlret='location.href="/zlist/1" ')
     else:
-        cursor.execute("select theme from application where id_application="+str(id_application))
-        res =cursor.fetchall()
-        msg='Заявка "' + res[0][0] + '" <br/> Удаление невозможно, свяжитесь с администратором'
+        cursor.execute("select theme from application where id_application=" + str(id_application))
+        res = cursor.fetchall()
+        msg = 'Заявка "' + res[0][0] + '" <br/> Удаление невозможно, свяжитесь с администратором'
         conn.close()
-        return render_template('message.html', ver=app.version, message=Markup(msg),urlret='javascript:history.go(-1)')
+        return render_template('message.html', ver=app.version, message=Markup(msg), urlret='javascript:history.go(-1)')
 
 
-def app_may_delete(id_app:int, curs) -> bool:
+def app_may_delete(id_app: int, curs) -> bool:
     # определяет допустимо ли удаление заявки
 
     curs.execute("select count(*) from conf where id_application=" + str(id_app))
-    resq=curs.fetchall()
-    if resq[0][0]<1:
+    resq = curs.fetchall()
+    if resq[0][0] < 1:
         res = True
     else:
         res = False
@@ -514,11 +509,10 @@ def app_may_delete(id_app:int, curs) -> bool:
     return res;
 
 
-#**********************************
+# **********************************
 
 @app.route('/conflist/<int:nompage>')
-def conflist(nompage:int):
-
+def conflist(nompage: int):
     au = session.get('is_auth', False)
     if (not au):
         return redirect("/login/")
@@ -530,7 +524,7 @@ def conflist(nompage:int):
              "from application a left outer join dict comp on (comp.dict_name='орг' and comp.id_dict=a.id_company) " + \
              "left outer join dict sc on (sc.dict_name='онаук' and sc.id_dict=a.id_sciency), members m " + \
              "where (a.deleted<>'Д' or a.deleted is null) and m.id_member=a.id_member and statusapplication in (1,3,4,5,6) " + \
-             "and m.id_member ="+str(session['id_member']) + \
+             "and m.id_member =" + str(session['id_member']) + \
              "order by datefrom, theme limit " + \
              str(app.lenthuserlistpage) + " offset " + str((session['cflist_nompage'] - 1) * app.lenthuserlistpage)
 
@@ -566,16 +560,16 @@ def conflist(nompage:int):
 
 @app.route('/listissue/<int:nompage>')
 def listissue(nompage):
-
     session['islist_nompage'] = nompage
 
     # ***********************
     #                       0             1        2                3                 4       5          6                              7                             8
-    idconf=session.get('id_application',-1)
+    idconf = session.get('id_application', -1)
     sqlstr = "select id_issue, i.name, i.author, to_char(i.date_create, 'dd.mm.yyyy'), to_char(i.date_load, 'dd.mm.yyyy'), m.name||' '||m.surname||' '||m.famely loader, i.statusissue " + \
-             "from issue i, members m " + \
-             "where (i.deleted<>'Д' or i.deleted is null) and m.id_member=i.id_member_ldr and id_application="  + str(idconf)+\
-             "order by name limit " + \
+             " from issue i, members m " + \
+             " where (i.deleted<>'Д' or i.deleted is null) and m.id_member=i.id_member_ldr and id_application=" + str(
+        idconf) + \
+             " order by name limit " + \
              str(app.lenthuserlistpage) + " offset " + str((session['islist_nompage'] - 1) * app.lenthuserlistpage)
 
     conn = psycopg2.connect(host=app.config['HOSTDATABASE'], user=app.config['USERNAME'],
@@ -586,7 +580,8 @@ def listissue(nompage):
 
     session.cflist = cursor.fetchall()
 
-    cursor.execute("select count(*) from issue where (deleted<>'Д' or deleted is null) and id_application="  + str(idconf))
+    cursor.execute(
+        "select count(*) from issue where (deleted<>'Д' or deleted is null) and id_application=" + str(idconf))
     amountrec = cursor.fetchall()[0][0]
 
     maxpage = (amountrec // app.lenthuserlistpage) + 1
@@ -608,8 +603,20 @@ def listissue(nompage):
     return render_template('listissue.html', ver=app.version)
 
 
+@app.route('/add_issue/', methods=['GET','POST'])
+def addissue():
+    return editissue(-1)
 
-#**********************************
+@app.route('/editissue/<int:idissue>')
+def editissue(idissue:int):
+    if request.method == 'POST':
+        session['is_date_create']=date.today();
+        session['is_date_load'] = date.today();
+
+    return render_template('editissue.html', ver=app.version)
+
+
+# **********************************
 
 if __name__ == '__main__':
     app.run()
