@@ -102,20 +102,20 @@ def write_registry():
                    (request.form['lgn'], request.form['id_member'],))
 
     res = cursor.fetchall()
-    if (res[0][0] > 0):
+    if res[0][0] > 0:
         session['res_reg'] = False
         session['errorstr'] = "Внимание! Такой логин уже зарегистрирован Измените логин и попробуйте еще раз."
     else:
         cursor.execute("select count(*) from members where name=%s and surname=%s and famely=%s and id_member<>%s",
                        (session['nm'], session['fml'], session['sn'], session['id_member'],))
         res = cursor.fetchall()
-        if (res[0][0] > 0):
+        if res[0][0] > 0:
             session['res_reg'] = False
             session[
                 'errorstr'] = "Внимание!Пользователь с такими фамилией именем и отчеством уже зарегистрирован. Регистрация не выполнена!"
 
-    if (session['res_reg']):
-        if (session['id_member'] == "-1"):
+    if session['res_reg']:
+        if session['id_member'] == "-1":
             #                                     1      2       3         4           5         6          7         8            9         10   11        12     13    14      15
             cursor.execute(
                 "insert into members(name, surname, famely, id_company, id_acdegree, email, id_position, birsday, id_acposition, sex, phone, add_info, login, pwd, addres) " +
@@ -124,7 +124,7 @@ def write_registry():
                  request.form['uzv'], request.form['em'], request.form['dlgn'], request.form['bd'], '0',
                  request.form['sex'], request.form['ph'],
                  request.form['add_info'], request.form['lgn'], request.form['pwd'], request.form['adr'],))
-            #                                             1                2                     3                     4                     5                 6                      7                  8             9      10                  11                   12                     13                        14           15
+            #                                             1                2                     3                     4                     5                 6                      7
             conn.commit()
             res = cursor.fetchall()
             session['pwdminlenth'] = 6
@@ -138,7 +138,8 @@ def write_registry():
         else:
             # это редактирование своего профиля
             cursor.execute(
-                "update members set name=%s, surname=%s,        famely=%s,           id_company=%s,           id_acdegree=%s,       email=%s,         id_position=%s,        birsday=%s,  id_acposition=%s, sex=%s,              phone=%s,           add_info=%s,              login=%s,             pwd=%s,              addres=%s where id_member=%s",
+                "update members set name = %s, surname = %s, famely = %s, id_company = %s, id_acdegree = %s, email = %s,         id_position = %s" \
+                ",        birsday = %s,  id_acposition = %s, sex = %s, phone = %s, add_info = %s, login = %s, pwd = %s, addres = %s where id_member = %s",
                 (
                     request.form['nm'], request.form['sn'], request.form['fml'], request.form['comp_nm'],
                     request.form['uzv'], request.form['em'], request.form['dlgn'], request.form['bd'], '0',
@@ -289,7 +290,7 @@ def deleteuser(id_member):
 @app.route('/zlist/<int:nompage>')
 def zlist(nompage):
     au = session.get('is_auth', False)
-    if (not au):
+    if not au:
         return redirect("/login/")
     session['zlist_nompage'] = nompage
 
@@ -317,11 +318,11 @@ def zlist(nompage):
     maxpage = (amountrec // app.lenthuserlistpage) + 1
 
     zlist_minpage = nompage - 5
-    if (zlist_minpage < 1):
+    if zlist_minpage < 1:
         zlist_minpage = 1
 
     zlist_maxpage = nompage + 5
-    if (zlist_maxpage > maxpage):
+    if zlist_maxpage > maxpage:
         zlist_maxpage = maxpage
 
     session['nmzpages'] = []
@@ -344,7 +345,7 @@ def addapplication():
 @app.route('/edit_z/<int:id_application>', methods=['GET', 'POST'])
 def edit_application(id_application):
     au = session.get('is_auth', False)
-    if (not au):
+    if not au:
         return redirect("/login/")
 
     if request.method == 'POST':
@@ -353,9 +354,9 @@ def edit_application(id_application):
             conn = psycopg2.connect(host=app.config['HOSTDATABASE'], user=app.config['USERNAME'],
                                     password=app.config['PASSWORD'], dbname=app.config['DBNAME'])
             cursor = conn.cursor()
-            if (session['app_id_application'] == '-1'):
+            if session['app_id_application'] == '-1':
                 cursor.execute(
-                    "INSERT INTO application(theme, id_company, id_sciency,     datefrom,                   dateto,              dateatticle,                 datedecision,                  id_member, deleted,describe_conf, orgcom_conf, statusapplication, id_moderator) " + \
+                    "INSERT INTO application(theme, id_company, id_sciency,     datefrom,                   dateto,              dateatticle,                 datedecision,                  id_member, deleted,describe_conf, orgcom_conf, statusapplication, id_moderator) " \
                     "VALUES (                 %s,       %s,        %s,              %s,                        %s,                   %s,                          %s,                           %s,       'Н',     %s,              %s,             %s,           %s ) returning id_application;",
                     (
                         request.form['theme'], request.form['comp_app'], request.form['type_sc'],
@@ -372,8 +373,8 @@ def edit_application(id_application):
                 conn.commit()
                 res = cursor.fetchall()
             else:
-                sqlstr = "update application set theme=%s, id_company=%s, id_sciency=%s, datefrom=%s, dateto=%s, dateatticle=%s, datedecision=%s, id_member=%s, describe_conf=%s,orgcom_conf=%s , statusapplication=%s , id_moderator=%s" + \
-                         "where id_application=" + str(session['app_id_application'])
+                sqlstr = "update application set theme = %s, id_company = %s, id_sciency = %s, datefrom = %s, dateto = %s, dateatticle = %s, datedecision = %s, id_member = %s, describe_conf = %s,orgcom_conf = %s , statusapplication = %s , id_moderator = %s " \
+                         "where id_application = " + str(session['app_id_application'])
                 cursor.execute(sqlstr,
                                (
                                    request.form['theme'], request.form['comp_app'], request.form['type_sc'],
@@ -417,7 +418,7 @@ def edit_application(id_application):
         session['app_statapps'] = [[0, 'на рассмотрении'], [1, 'одобрена'], [2, 'отказано']]
         #
 
-        if (id_application == -1):
+        if id_application == -1:
             session['app_id_application'] = '-1'
             session['app_theme'] = ''
             session['app_id_company'] = session['comp_nm']
@@ -542,11 +543,11 @@ def conflist(nompage: int):
     maxpage = (amountrec // app.lenthuserlistpage) + 1
 
     cflist_minpage = nompage - 5
-    if (cflist_minpage < 1):
+    if cflist_minpage < 1:
         cflist_minpage = 1
 
     cflist_maxpage = nompage + 5
-    if (cflist_maxpage > maxpage):
+    if cflist_maxpage > maxpage:
         cflist_maxpage = maxpage
 
     session['nmcfpages'] = []
@@ -567,8 +568,7 @@ def listissue(nompage):
     idconf = session.get('id_application', -1)
     sqlstr = "select id_issue, i.name, i.author, to_char(i.date_create, 'dd.mm.yyyy'), to_char(i.date_load, 'dd.mm.yyyy'), m.name||' '||m.surname||' '||m.famely loader, i.statusissue " + \
              " from issue i, members m " + \
-             " where (i.deleted<>'Д' or i.deleted is null) and m.id_member=i.id_member_ldr and id_application=" + str(
-        idconf) + \
+             " where (i.deleted<>'Д' or i.deleted is null) and m.id_member=i.id_member_ldr and id_application=" + str(idconf) + \
              " order by name limit " + \
              str(app.lenthuserlistpage) + " offset " + str((session['islist_nompage'] - 1) * app.lenthuserlistpage)
 
@@ -587,11 +587,11 @@ def listissue(nompage):
     maxpage = (amountrec // app.lenthuserlistpage) + 1
 
     cflist_minpage = nompage - 5
-    if (cflist_minpage < 1):
+    if cflist_minpage < 1:
         cflist_minpage = 1
 
     cflist_maxpage = nompage + 5
-    if (cflist_maxpage > maxpage):
+    if cflist_maxpage > maxpage:
         cflist_maxpage = maxpage
 
     session['nmcfpages'] = []
@@ -606,6 +606,7 @@ def listissue(nompage):
 @app.route('/add_issue/', methods=['GET','POST'])
 def addissue():
     return editissue(-1)
+
 
 @app.route('/editissue/<int:idissue>')
 def editissue(idissue:int):
