@@ -10,7 +10,7 @@ body    {
             padding: 0px;
             margin:0px;
             width: 98.3%;
-            min-width:1024px;
+            min-width:800px;
             height:4em;
             background-color: azure;
             border: 1px solid black;
@@ -45,18 +45,18 @@ body    {
             min-width: 800px;
             position: relative;
 /*            min-height:340px;
-            height:100%;*/
-    border: 1px solid black;
+            height:100%;
+    border: 1px solid black;*/
             float:left;
 
 }
 
 .left-box{
-            margin-top:7px;
+            margin-top:10px;
             margin-left:0px;
             margin-right:0px;
             padding: 10px;
-            width:260px;
+            width:15%;
             background-color: azure;
             border: 1px solid black;
             border-radius: 10px;
@@ -73,10 +73,10 @@ body    {
 
 
 .content-box{
-            margin-top:7px;
-            margin-left:7px;
+            margin-top:10px;
+            margin-left:10px;
             padding: 10px;
-            width:calc(98.3% - 280px);
+            width:calc(85% - 54px);
             min-width: 400px;
             background-color: azure;
             border: 1px solid black;
@@ -87,9 +87,9 @@ body    {
 
 /*футер */
 .foot   {
-            width: 98.3%;
+            width: calc(98.3% - 20px);
 
-            margin-top:7px;
+            margin-top:10px;
             padding: 10px;
             background-color: azure;
             border:  1px solid black;
