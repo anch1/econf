@@ -42,27 +42,27 @@
                                     <div class="pagerow">
 
                                         {% if (session['islist_nompage']==1) %}
-                                            <a class='nextprew' href='/islist/1'>Пред</a>
+                                            <a class='nextprew' href='/islist/1/{{session.id_application}}'>Пред</a>
                                         {% else %}
-                                            <a class='nextprew' href='/islist/{{ session.islist_nompage-1 }}'>Пред</a>
+                                            <a class='nextprew' href='/islist/{{ session.islist_nompage-1 }}/{{session.id_application}}'>Пред</a>
                                         {% endif %}
 
                                         {% for pg in session['nmispages'] %}
                                             {% if pg!=session['islist_nompage'] %}
-                                                <a class='page' href='/islist/{{ pg}}'>{{ pg }}</a>
+                                                <a class='page' href='/islist/{{ pg}}/{{session.id_application}}'>{{ pg }}</a>
                                             {% else %}
-                                                <a class="currentpage" href='/islist/{{ pg}}'>{{ pg }}</a>
+                                                <a class="currentpage" href='/islist/{{ pg}}/{{session.id_application}}'>{{ pg }}</a>
                                             {% endif %}
 
                                         {% endfor %}
 
-                                        <a class='nextprew' href='/islist/{%if session.islist_nompage>=session.maxzpages%}{{session.maxzpages}}{% else %}{{ session.islist_nompage+1}}{%endif%}'>След</a>
+                                        <a class='nextprew' href='/islist/{%if session.islist_nompage>=session.maxispages%}{{session.maxispages}}{% else %}{{ session.islist_nompage+1}}{%endif%}/{{session.id_application}}'>След</a>
                                     </div>
                                 </td>
                                 </tr>
                             </tfoot>
 
-                            {% for s in session.cflist %}
+                            {% for s in session.islist %}
                                 <tr>
                                     <td>
                                          <a href='/edit_is/{{ s[0]}}'>{{ s[1] }}</a> <!-- тема -->
@@ -72,7 +72,7 @@
                                     </td>
 
                                     <td>
-                                        <a href='/edit_is/{{ s[0]}}'>c {{ s[4] }} по {{ s[5] }}</a>   <!--!compname -->
+                                        <a href='/edit_is/{{ s[0]}}'> {{ s[5] }}</a>   <!--!compname -->
                                     </td>
                                     <td>
                                         <a href='/edit_is/{{ s[0]}}'>{{ s[8] }}</a>   <!-- дата подачи статей-->

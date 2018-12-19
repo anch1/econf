@@ -28,7 +28,7 @@
     <script src={{url_for('static', filename='ckeditor/ckeditor.js') }}></script>
 
     <div>
-    <form id="loadissue_frm" action="" enctype="multipart/form-data" method="post" class="loadissue_frm">
+    <form id="loadissue_frm" action="" method="post" enctype="multipart/form-data" class="loadissue_frm">
 <!--          <center>
             <fieldset class ="fst" >
 -->            <input hidden value="{{ session.iss_id_issue }}" id="id_issue" type="text" name="id_issue">
@@ -102,15 +102,22 @@
                                 <input class="inpis" required tabindex="5" value="{{ session.is_tags_rus }}" id="is_tags_rus" type="text" name="is_tags_rus" {{ session.is_disabled }}>
                             </td>
                             <td>
-                                <label for="is_udk">Ключевые слова(eng)</label>
+                                <label for="is_tags_eng">Ключевые слова(eng)</label>
                             </td>
                             <td>
-                                <input  class="inpis" value="{{ session.is_udk }}" required tabindex="6" id="is_udk" type="text" name="is_udk"  {{ session.is_disabled }}>
+                                <input class="inpis" required tabindex="5" value="{{ session.is_tags_eng }}" id="is_tags_eng" type="text" name="is_tags_eng" {{ session.is_disabled }}>
                             </td>
                         </tr>
 
 
                         <tr>
+                            <td>
+                                <label for="is_udk">УДК</label>
+                            </td>
+                            <td>
+                                <input  class="inpis" value="{{ session.is_udk }}" required tabindex="6" id="is_udk" type="text" name="is_udk"  {{ session.is_disabled }}>
+                            </td>
+
                             <td>
                                 <label for="inpfile">Укажите файл для загрузки</label>
                             </td>

@@ -62,7 +62,7 @@
 
                                         {% endfor %}
 
-                                        <a class='nextprew' href='/conflist/{%if session.cflist_nompage>=session.maxzpages%}{{session.maxzpages}}{% else %}{{ session.cflist_nompage+1}}{%endif%}'>След</a>
+                                        <a class='nextprew' href='/conflist/{%if session.cflist_nompage>=session.maxcfpages%}{{session.maxcfpages}}{% else %}{{ session.cflist_nompage+1}}{%endif%}'>След</a>
                                     </div>
                                 </td>
                                 </tr>
@@ -88,7 +88,7 @@
                                     </td>
                                     <td>
 
-                                        <a href='/listissue/1' >Список докладов и публикаций</a>
+                                        <a href='/listissue/1/{{s[0]}}' >Список докладов и публикаций</a>
                                         <a href='/editconf/{{ s[0]}}' >Просмотреть подробности</a>
                                         <a href='/deletec/{{ s[0]}}' onclick='return accept_onclick()'>Удалить</a>
                                     </td>

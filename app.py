@@ -1,8 +1,9 @@
+import os
 from typing import Any, Union
 from datetime import datetime, date, time
 import psycopg2
 from flask import Flask, request, render_template, session, redirect, Markup
-
+from werkzeug.utils import secure_filename
 from flask import Flask
 
 app = Flask(__name__)
@@ -14,6 +15,9 @@ app.config['PASSWORD'] = "tom321jerry"
 app.config['DBNAME'] = "conf"
 app.config['CONNECT'] = psycopg2.connect(host=app.config['HOSTDATABASE'], user=app.config['USERNAME'],
                                          password=app.config['PASSWORD'], dbname=app.config['DBNAME'])
+app.config['UPLOAD_FOLDER'] = "/home/pi/PycharmProjects/econf/upload"
+app.config['ALLOWED_EXTENSION'] = set(['PDF','DOC'])
+
 app.secret_key = 'hrenpenten'
 app.version = '0.0.0.1'
   
@@ -559,14 +563,16 @@ def conflist(nompage: int):
     return render_template('cflist.html', ver=app.version)
 
 
-@app.route('/listissue/<int:nompage>')
-def listissue(nompage):
+@app.route('/listissue/<int:nompage>/<int:id_app>')
+def listissue(nompage, id_app):
     session['islist_nompage'] = nompage
 
     # ***********************
     #                       0             1        2                3                 4       5          6                              7                             8
-    idconf = session.get('id_application', -1)
-    sqlstr = "select id_issue, i.name, i.author, to_char(i.date_create, 'dd.mm.yyyy'), to_char(i.date_load, 'dd.mm.yyyy'), m.name||' '||m.surname||' '||m.famely loader, i.statusissue " + \
+#    idconf = session.get('id_application', -1)
+    idconf = id_app
+    session['id_application']=id_app
+    sqlstr = "select id_issue, i.name, i.author, to_char(i.date_create, 'dd.mm.yyyy'), to_char(i.date_load, 'dd.mm.yyyy'), udk, m.name||' '||m.surname||' '||m.famely loader, i.statusissue " + \
              " from issue i, members m " + \
              " where (i.deleted<>'Д' or i.deleted is null) and m.id_member=i.id_member_ldr and id_application=" + str(idconf) + \
              " order by name limit " + \
@@ -578,7 +584,7 @@ def listissue(nompage):
 
     cursor.execute(sqlstr)
 
-    session.cflist = cursor.fetchall()
+    session.islist = cursor.fetchall()
 
     cursor.execute(
         "select count(*) from issue where (deleted<>'Д' or deleted is null) and id_application=" + str(idconf))
@@ -586,35 +592,75 @@ def listissue(nompage):
 
     maxpage = (amountrec // app.lenthuserlistpage) + 1
 
-    cflist_minpage = nompage - 5
-    if cflist_minpage < 1:
-        cflist_minpage = 1
+    islist_minpage = nompage - 5
+    if islist_minpage < 1:
+        islist_minpage = 1
 
-    cflist_maxpage = nompage + 5
-    if cflist_maxpage > maxpage:
-        cflist_maxpage = maxpage
+    islist_maxpage = nompage + 5
+    if islist_maxpage > maxpage:
+        islist_maxpage = maxpage
 
-    session['nmcfpages'] = []
-    session['maxcfpages'] = cflist_maxpage
-    for i in range(cflist_minpage, cflist_maxpage + 1):
-        session['nmcfpages'].append(i)
+    session['nmispages'] = []
+    session['maxispages'] = islist_maxpage
+    for i in range(islist_minpage, islist_maxpage + 1):
+        session['nmispages'].append(i)
 
     conn.close()
     return render_template('listissue.html', ver=app.version)
 
 
-@app.route('/add_issue/', methods=['GET','POST'])
+@app.route('/add_issue/', methods=['GET', 'POST'])
 def addissue():
     return editissue(-1)
 
 
+
 @app.route('/editissue/<int:idissue>')
-def editissue(idissue:int):
-    if request.method == 'POST':
-        session['is_date_create']=date.today();
-        session['is_date_load'] = date.today();
+def editissue(idissue: int):
+    idconf = session.get('id_application', -1)
+
+    if request.method == 'GET':
+        if idissue == -1:
+            session['is_date_create']=date.today()
+            session['is_date_load'] = date.today()
+        else:
+            pass
+
+    else:
+        conn = psycopg2.connect(host=app.config['HOSTDATABASE'], user=app.config['USERNAME'],
+                                password=app.config['PASSWORD'], dbname=app.config['DBNAME'])
+        cursor = conn.cursor()
+
+
+        if idissue == -1:
+
+
+            sqlstr = "insert into issue (name, annotation_r, annotation_e, tags_r,tags_e,date_create ,date_load,author, id_member_ldr, statusissue, deleted, id_application ) " +\
+                   "           values (%s,      %s,          %s,          %s,    %s,       %s,             %s,    %s,         %s,          %s,         %s,        %s) returning id_issue"
+            cursor.execute(sqlstr, (request.form['name_issue'], request.form['is_ann_rus'], request.form['is_ann_eng'], request.form['is_tags_rus'], request.form['is_tags_eng'], request.form['date_create'],request.form['date_load'], request.form['is_authors'],  session['id_member'], '0', 'Н', session['id_application']))
+            conn.commit()
+            idissue = cursor.fetchall()[0][0]
+            # Сохраним сам файл публикации. Имя - id из таблицы issue (потоп можно сделать каталог по шв конференции
+            file = request.files['inpfile']
+            filename = secure_filename(file.filename)
+            if '.' in filename:
+                if filename.split('.')[1].upper() in app.config['ALLOWED_EXTENSION']:
+                    filename = str(idissue)+'.'+filename.rsplit('.')[1]
+                else:
+                    #это косяк
+                    pass
+            else:
+                # это косяк
+                pass
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+        else:
+            sqlstr = "update issue set name = %s, annotation_r = %s,  annotation_e = %s, tags_r = %s, tags_e = %s, date_create=%s, date_load = %s, author = %s, id_member_ldr = %s, statusissue = %s, deleted = %s where id_issue=%s"
+
 
     return render_template('editissue.html', ver=app.version)
+
+
 
 
 # **********************************
