@@ -43,13 +43,13 @@
                                 <label for="date_create">Дата публикации</label>
                             </td>
                             <td>
-                                <input class="inpis" autofocus required tabindex="5" value="{{ session.is_date_create }}" id="date_create" type="date" name="date_create" title="дата первой публикации работы" {{ session.is_disabled }}>
+                                <input class="inpis" autofocus required tabindex="1" value="{{ is_date_create }}" id="date_create" type="date" name="date_create" title="дата первой публикации работы" {{ session.is_disabled }}>
                             </td>
                             <td>
                                 <label for="date_load">дата загрузки</label>
                             </td>
                             <td>
-                                <input  class="inpis" value="{{ session.is_date_load }}" required tabindex="6" id="date_load" type="date" name="date_load"  {{ session.is_disabled }}>
+                                <input  class="inpis" value="{{ is_date_load }}" required tabindex="2" id="date_load" type="date" name="date_load"  {{ session.is_disabled }}>
                             </td>
                         </tr>
                         <tr>
@@ -57,13 +57,13 @@
                                 <label for="name_issue">Название публикации</label>
                             </td>
                             <td>
-                                <input class="inpis" required tabindex="5" value="{{ session.is_name }}" id="name_issue" type="text" name="name_issue" {{ session.is_disabled }}>
+                                <input class="inpis" required tabindex="3" value="{{ is_name }}" id="name_issue" type="text" name="name_issue" {{ session.is_disabled }}>
                             </td>
                             <td>
                                 <label for="is_authors">Автор/авторы</label>
                             </td>
                             <td>
-                                <input  class="inpis" value="{{ session.is_authors }}" required tabindex="6" id="is_authors" type="text" name="is_authors"  {{ session.is_disabled }}>
+                                <input  class="inpis" value="{{ is_authors }}" required tabindex="4" id="is_authors" type="text" name="is_authors"  {{ session.is_disabled }}>
                             </td>
                         </tr>
 
@@ -74,8 +74,8 @@
                         </tr>
                         <tr class="rowcenter">
                             <td colspan="4" >
-                                 <textarea  id="is_ann_rus"  tabindex="11"  cols="80" rows="10" name="is_ann_rus" {{ session.is_disabled }} >
-                                     {{ session.is_ann_rus }}
+                                 <textarea  id="is_ann_rus"  tabindex="5"  cols="80" rows="10" name="is_ann_rus" {{ session.is_disabled }} >
+                                     {{ is_ann_rus }}
                                  </textarea>
                             </td>
                         </tr>
@@ -87,8 +87,8 @@
                         </tr>
                         <tr class="rowcenter" >
                             <td colspan="4" >
-                                 <textarea  id="is_ann_eng"  tabindex="11"  cols="80" rows="10" name="is_ann_eng" {{ session.is_disabled }} >
-                                     {{ session.is_ann_eng }}
+                                 <textarea  id="is_ann_eng"  tabindex="6"  cols="80" rows="10" name="is_ann_eng" {{ session.is_disabled }} >
+                                     {{ is_ann_eng }}
                                  </textarea>
                             </td>
                         </tr>
@@ -99,13 +99,13 @@
                                 <label for="is_tags_rus">Ключевые слова(рус)</label>
                             </td>
                             <td>
-                                <input class="inpis" required tabindex="5" value="{{ session.is_tags_rus }}" id="is_tags_rus" type="text" name="is_tags_rus" {{ session.is_disabled }}>
+                                <input class="inpis" required tabindex="7" value="{{ is_tags_rus }}" id="is_tags_rus" type="text" name="is_tags_rus" {{ session.is_disabled }}>
                             </td>
                             <td>
                                 <label for="is_tags_eng">Ключевые слова(eng)</label>
                             </td>
                             <td>
-                                <input class="inpis" required tabindex="5" value="{{ session.is_tags_eng }}" id="is_tags_eng" type="text" name="is_tags_eng" {{ session.is_disabled }}>
+                                <input class="inpis" required tabindex="8" value="{{ is_tags_eng }}" id="is_tags_eng" type="text" name="is_tags_eng" {{ session.is_disabled }}>
                             </td>
                         </tr>
 
@@ -115,37 +115,43 @@
                                 <label for="is_udk">УДК</label>
                             </td>
                             <td>
-                                <input  class="inpis" value="{{ session.is_udk }}" required tabindex="6" id="is_udk" type="text" name="is_udk"  {{ session.is_disabled }}>
+                                <input  class="inpis" value="{{ is_udk }}" required tabindex="9" id="is_udk" type="text" name="is_udk"  {{ session.is_disabled }}>
                             </td>
 
                             <td>
                                 <label for="inpfile">Укажите файл для загрузки</label>
                             </td>
                             <td >
-                                 <input class="inpfile" required tabindex="1" id="inpfile" type="file" name="inpfile"  >
+                                 <input class="inpfile" required tabindex="10" id="inpfile" type="file" name="inpfile"  >
+                            </td>
+                        </tr>
+
+                        <tr class="rowcenter" >
+                            <td colspan="4" >
+                                {% if is_filename!=""  %}
+                                    <p><b>Материал публикации</b></p>
+                                {%  endif %}
+
+                                 <embed src="{{url_for('static', filename=is_filename)}}" width="100%" height="1200px" />
                             </td>
                         </tr>
 
 
-
                         <tr class="rowcenter">
                             <td colspan="2" >
-                                <input type="submit" tabindex="13" value="Отправить" name="subapp" {{ session.is_disabled }}>
+                                <input type="submit" tabindex="11" value="Отправить" name="subapp" {{ session.is_disabled }}>
                             </td>
 
                             <td colspan="2" >
-                                 <input type="button" tabindex="14" value="Отмена" name="break" onclick="location.href='javascript:history.go(-1)' ">
+                                 <input type="button" tabindex="12" value="Отмена" name="break" onclick="location.href='javascript:history.go(-1)' ">
                             </td>
                         </tr>
 
 
 
                     </table>
-                    <a href="../upload/19.pdf">Ссыль </a>
 
-                    <object width="400" height="500" type="application/pdf" data="{{url_for('static', filename='19.pdf') }}">
-                        <p>Insert your error message here, if the PDF cannot be displayed.</p>
-                    </object>
+
         <!--
             </fieldset>
 <!--         </center>
