@@ -682,13 +682,13 @@ def editissue(idissue: int):
     conn.close()
 
     if is_filename is None:
-        is_filename=""
+        is_filename = ""
     return render_template( 'editissue.html', ver=app.version,     is_name = is_name, is_ann_rus = is_ann_rus, is_ann_eng = is_ann_eng, is_tags_rus = is_tags_rus, is_tags_eng = is_tags_eng, is_date_create = is_date_create, is_date_load = is_date_load, is_authors = is_authors, is_id_memeber = is_id_memeber, is_filename = is_filename, is_udk=is_udk )
 
 
 def getInnerFilename(idis):
     fn = None
-    if request.files.__len__ != 0:
+    if 'file' in request.files :
         file = request.files['inpfile']
         fn = secure_filename(file.filename)
         if '.' in fn:
