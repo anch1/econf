@@ -2,9 +2,8 @@ import os
 from typing import Any, Union
 from datetime import datetime, date, time
 import psycopg2
-from flask import Flask, request, render_template, session, redirect, Markup
+from flask import Flask, request, render_template, session, redirect, Markup, url_for
 from werkzeug.utils import secure_filename
-from flask import Flask
 
 app = Flask(__name__)
 
@@ -615,22 +614,48 @@ def addissue():
 
 
 
-@app.route('/editissue/<int:idissue>')
+@app.route('/editissue/<int:idissue>',methods=['POST','GET'])
 def editissue(idissue: int):
     idconf = session.get('id_application', -1)
 
+    conn = psycopg2.connect(host=app.config['HOSTDATABASE'], user=app.config['USERNAME'],
+                            password=app.config['PASSWORD'], dbname=app.config['DBNAME'])
+    cursor = conn.cursor()
+    is_name = ""
+    is_ann_rus = ""
+    is_ann_eng = ""
+    is_tags_rus = ""
+    is_tags_eng = ""
+    is_date_create = date.today()
+    is_date_load = date.today()
+    is_authors = ""
+    is_id_memeber = -1
+    is_udk = ""
+    is_filename = ""
+
     if request.method == 'GET':
-        if idissue == -1:
-            session['is_date_create']=date.today()
-            session['is_date_load'] = date.today()
-        else:
-            pass
+        if idissue != -1:
+            # Считываем и готовим данные публикации
+            #                    0       1     2                3            4    5      6       7            8         9          10             11         12        13             14
+            sqlstr = "select id_issue, name, annotation_r, annotation_e, tags_r,tags_e, udk, date_create, date_load, author, id_member_ldr,  statusissue, deleted, id_application, filename from issue where id_issue=%s"
+            cursor.execute(sqlstr,(str(idissue),))
+            res = cursor.fetchall()
+            is_name = res[0][1]
+            is_ann_rus = res[0][2]
+            is_ann_eng = res[0][3]
+            is_tags_rus = res[0][4]
+            is_tags_eng = res[0][5]
+            is_udk = res[0][6]
+            is_date_create = res[0][7]
+            is_date_load = res[0][7]
+            is_authors = res[0][9]
+            is_id_memeber = res[0][10]
+            is_filename = res[0][14]
+
+
+
 
     else:
-        conn = psycopg2.connect(host=app.config['HOSTDATABASE'], user=app.config['USERNAME'],
-                                password=app.config['PASSWORD'], dbname=app.config['DBNAME'])
-        cursor = conn.cursor()
-
 
         if idissue == -1:
 
@@ -641,26 +666,40 @@ def editissue(idissue: int):
             conn.commit()
             idissue = cursor.fetchall()[0][0]
             # Сохраним сам файл публикации. Имя - id из таблицы issue (потоп можно сделать каталог по шв конференции
-            file = request.files['inpfile']
-            filename = secure_filename(file.filename)
-            if '.' in filename:
-                if filename.split('.')[1].upper() in app.config['ALLOWED_EXTENSION']:
-                    filename = str(idissue)+'.'+filename.rsplit('.')[1]
-                else:
-                    #это косяк
-                    pass
-            else:
-                # это косяк
-                pass
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            is_filename = getInnerFilename(idis)
+            if is_filename != "":
+                sqlstr="update issue set filename = %s where id_issue = %s" 
+                cursor.execute(sqlstr, (is_filename, str(idissue)))
+                conn.commit()
+
 
         else:
             sqlstr = "update issue set name = %s, annotation_r = %s,  annotation_e = %s, tags_r = %s, tags_e = %s, date_create=%s, date_load = %s, author = %s, id_member_ldr = %s, statusissue = %s, deleted = %s where id_issue=%s"
+            cursor.execute(sqlstr, (request.form['name_issue'], request.form['is_ann_rus'], request.form['is_ann_eng'], request.form['is_tags_rus'], request.form['is_tags_eng'], request.form['date_create'],request.form['date_load'], request.form['is_authors'],  session['id_member'], '0', 'Н', str(idissue),))
+            conn.commit()
+            is_filename = getInnerFilename(idissue)
+
+    conn.close()
+
+    if is_filename is None:
+        is_filename=""
+    return render_template( 'editissue.html', ver=app.version,     is_name = is_name, is_ann_rus = is_ann_rus, is_ann_eng = is_ann_eng, is_tags_rus = is_tags_rus, is_tags_eng = is_tags_eng, is_date_create = is_date_create, is_date_load = is_date_load, is_authors = is_authors, is_id_memeber = is_id_memeber, is_filename = is_filename, is_udk=is_udk )
 
 
-    return render_template('editissue.html', ver=app.version)
+def getInnerFilename(idis):
+    fn = None
+    if request.files.__len__ != 0:
+        file = request.files['inpfile']
+        fn = secure_filename(file.filename)
+        if '.' in fn:
+            if fn.split('.')[1].upper() in app.config['ALLOWED_EXTENSION']:
+                fn = str(idis) + '.' + fn.rsplit('.')[1]
+            else:
+                fn = None  # не разрешенное расширение - выкидываем файл нафиг
+        else:
+            is_filename = None  # нет расширения - выкидываем файл нафиг
 
-
+    return fn
 
 
 # **********************************
