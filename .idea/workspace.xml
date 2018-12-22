@@ -1,13 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d40adc76-707e-418d-8c78-5b2259dac097" name="Default" comment="44">
+    <list default="true" id="d40adc76-707e-418d-8c78-5b2259dac097" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyapp.7z" beforeDir="false" afterPath="$PROJECT_DIR$/pyapp.7z" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/cflist.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/cflist.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/editissue.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/editissue.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/listissue.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/listissue.html" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -17,7 +12,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/econf$econf.coverage" NAME="econf Coverage Results" MODIFIED="1545221142987" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/econf$econf.coverage" NAME="econf Coverage Results" MODIFIED="1545242696914" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="DatabaseView">
     <option name="SHOW_INTERMEDIATE" value="true" />
@@ -44,14 +39,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="app.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="app.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="159">
-              <caret line="646" column="49" selection-start-line="646" selection-start-column="49" selection-end-line="646" selection-end-column="49" />
-              <folding>
-                <element signature="e#0#9#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="141">
+              <caret line="660" selection-start-line="660" selection-end-line="660" />
             </state>
           </provider>
         </entry>
@@ -59,7 +51,7 @@
       <file leaf-file-name="listissue.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/templates/listissue.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="221">
+            <state relative-caret-position="1406">
               <caret line="74" column="69" selection-start-line="74" selection-start-column="69" selection-end-line="74" selection-end-column="69" />
             </state>
           </provider>
@@ -68,17 +60,17 @@
       <file leaf-file-name="cflist.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/templates/cflist.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="209">
-              <caret line="64" column="140" selection-start-line="64" selection-start-column="140" selection-end-line="64" selection-end-column="140" />
+            <state relative-caret-position="1216">
+              <caret line="64" column="142" selection-start-line="64" selection-start-column="142" selection-end-line="64" selection-end-column="142" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="editissue.html" pinned="false" current-in-tab="false">
+      <file leaf-file-name="editissue.html" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/templates/editissue.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="247">
-              <caret line="137" column="33" selection-start-line="137" selection-start-column="33" selection-end-line="137" selection-end-column="33" />
+            <state relative-caret-position="438">
+              <caret line="145" column="123" selection-start-line="145" selection-start-column="123" selection-end-line="145" selection-end-column="123" />
             </state>
           </provider>
         </entry>
@@ -86,7 +78,7 @@
       <file leaf-file-name="Registry.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/templates/Registry.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="171">
+            <state relative-caret-position="855">
               <caret line="45" column="30" selection-start-line="45" selection-start-column="30" selection-end-line="45" selection-end-column="43" />
             </state>
           </provider>
@@ -184,9 +176,9 @@
         <option value="$PROJECT_DIR$/templates/test.html" />
         <option value="$PROJECT_DIR$/static/css/style.css" />
         <option value="$PROJECT_DIR$/templates/cflist.html" />
-        <option value="$PROJECT_DIR$/templates/editissue.html" />
         <option value="$PROJECT_DIR$/templates/listissue.html" />
         <option value="$PROJECT_DIR$/app.py" />
+        <option value="$PROJECT_DIR$/templates/editissue.html" />
       </list>
     </option>
   </component>
@@ -215,6 +207,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -232,11 +225,6 @@
               <item name="econf" type="462c0819:PsiDirectoryNode" />
               <item name="static" type="462c0819:PsiDirectoryNode" />
               <item name="css" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="econf" type="b2602c69:ProjectViewProjectNode" />
-              <item name="econf" type="462c0819:PsiDirectoryNode" />
-              <item name="templates" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="econf" type="b2602c69:ProjectViewProjectNode" />
@@ -262,7 +250,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -340,7 +327,14 @@
       <option name="project" value="LOCAL" />
       <updated>1545122873680</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary=" pdf">
+      <created>1545242964739</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1545242964739</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -354,13 +348,13 @@
       <window_info anchor="bottom" id="Python Console" order="7" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.40170032" />
       <window_info anchor="bottom" id="Terminal" order="7" weight="0.32798165" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.096354164" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.1875" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="right" id="Database" order="3" />
       <window_info anchor="right" id="SciView" order="3" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
-      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.46758768" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.46758768" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -380,39 +374,35 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="22.10.2018" />
     <MESSAGE value="44" />
-    <option name="LAST_COMMIT_MESSAGE" value="44" />
+    <MESSAGE value=" pdf" />
+    <option name="LAST_COMMIT_MESSAGE" value=" pdf" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>500</line>
+          <line>504</line>
           <option name="timeStamp" value="41" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>488</line>
+          <line>492</line>
           <option name="timeStamp" value="42" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>506</line>
+          <line>510</line>
           <option name="timeStamp" value="44" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>644</line>
-          <option name="timeStamp" value="66" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/app.py</url>
-          <line>634</line>
+          <line>635</line>
           <option name="timeStamp" value="67" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app.py</url>
-          <line>621</line>
+          <line>626</line>
           <option name="timeStamp" value="68" />
         </line-breakpoint>
       </breakpoints>
@@ -781,28 +771,21 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/templates/Registry.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="171">
+        <state relative-caret-position="855">
           <caret line="45" column="30" selection-start-line="45" selection-start-column="30" selection-end-line="45" selection-end-column="43" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/editissue.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="247">
-          <caret line="137" column="33" selection-start-line="137" selection-start-column="33" selection-end-line="137" selection-end-column="33" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/templates/cflist.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="209">
-          <caret line="64" column="140" selection-start-line="64" selection-start-column="140" selection-end-line="64" selection-end-column="140" />
+        <state relative-caret-position="1216">
+          <caret line="64" column="142" selection-start-line="64" selection-start-column="142" selection-end-line="64" selection-end-column="142" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/templates/listissue.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
+        <state relative-caret-position="1406">
           <caret line="74" column="69" selection-start-line="74" selection-start-column="69" selection-end-line="74" selection-end-column="69" />
         </state>
       </provider>
@@ -816,11 +799,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="159">
-          <caret line="646" column="49" selection-start-line="646" selection-start-column="49" selection-end-line="646" selection-end-column="49" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="141">
+          <caret line="660" selection-start-line="660" selection-end-line="660" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/editissue.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="438">
+          <caret line="145" column="123" selection-start-line="145" selection-start-column="123" selection-end-line="145" selection-end-column="123" />
         </state>
       </provider>
     </entry>
