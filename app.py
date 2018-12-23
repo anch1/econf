@@ -14,7 +14,7 @@ app.config['PASSWORD'] = "tom321jerry"
 app.config['DBNAME'] = "conf"
 app.config['CONNECT'] = psycopg2.connect(host=app.config['HOSTDATABASE'], user=app.config['USERNAME'],
                                          password=app.config['PASSWORD'], dbname=app.config['DBNAME'])
-app.config['UPLOAD_FOLDER'] = "/home/pi/PycharmProjects/econf/upload"
+app.config['UPLOAD_FOLDER'] = "/home/pi/PycharmProjects/econf/static/upload"
 app.config['ALLOWED_EXTENSION'] = set(['PDF','DOC'])
 
 app.secret_key = 'hrenpenten'
@@ -78,7 +78,7 @@ def registry():
 
 @app.route('/registration/', methods=['POST'])
 def write_registry():
-    # проеряем что нет такого логина и фио
+    # проверяем что нет такого логина и фио
     session['pwdminlenth'] = 6
     session['res_reg'] = True
     session['errorstr'] = ""
@@ -114,8 +114,7 @@ def write_registry():
         res = cursor.fetchall()
         if res[0][0] > 0:
             session['res_reg'] = False
-            session[
-                'errorstr'] = "Внимание!Пользователь с такими фамилией именем и отчеством уже зарегистрирован. Регистрация не выполнена!"
+            session['errorstr'] = "Внимание!Пользователь с такими фамилией именем и отчеством уже зарегистрирован. Регистрация не выполнена!"
 
     if session['res_reg']:
         if session['id_member'] == "-1":
@@ -278,9 +277,6 @@ def userlist(nompage):
     return render_template('userlist.html', ver=app.version)
 
 
-@app.route('/edit_user/<int:id_member>')
-def edituser(id_member):
-    return render_template('Edit_user.html', ver=app.version)
 
 
 @app.route('/delete_user/<int:id_member>')
@@ -315,7 +311,7 @@ def zlist(nompage):
 
     session.zlist = cursor.fetchall()
 
-    cursor.execute("select count(*) from application where (deleted<>'Д' or deleted is null)")
+    cursor.execute("select count(*) from application where (deleted<>'Д' or deleted is null) and id_member =" + str(session['id_member']))
     amountrec = cursor.fetchall()[0][0]
 
     maxpage = (amountrec // app.lenthuserlistpage) + 1
@@ -608,14 +604,17 @@ def listissue(nompage, id_app):
     return render_template('listissue.html', ver=app.version)
 
 
-@app.route('/add_issue/', methods=['GET', 'POST'])
-def addissue():
-    return editissue(-1)
+@app.route('/add_issue/', methods=['GET'])
+def addissueget():
+    return editissueget(-1)
+
+@app.route('/add_issue/', methods=['POST'])
+def addissuepost():
+    return editissuepost(-1)
 
 
-
-@app.route('/editissue/<int:idissue>',methods=['POST','GET'])
-def editissue(idissue: int):
+@app.route('/editissue/<int:idissue>', methods=['GET'])
+def editissueget(idissue: int):
     idconf = session.get('id_application', -1)
 
     conn = psycopg2.connect(host=app.config['HOSTDATABASE'], user=app.config['USERNAME'],
@@ -633,62 +632,79 @@ def editissue(idissue: int):
     is_udk = ""
     is_filename = ""
 
-    if request.method == 'GET':
-        if idissue != -1:
-            # Считываем и готовим данные публикации
-            #                    0       1     2                3            4    5      6       7            8         9          10             11         12        13             14
-            sqlstr = "select id_issue, name, annotation_r, annotation_e, tags_r,tags_e, udk, date_create, date_load, author, id_member_ldr,  statusissue, deleted, id_application, filename from issue where id_issue=%s"
-            cursor.execute(sqlstr,(str(idissue),))
-            res = cursor.fetchall()
-            is_name = res[0][1]
-            is_ann_rus = res[0][2]
-            is_ann_eng = res[0][3]
-            is_tags_rus = res[0][4]
-            is_tags_eng = res[0][5]
-            is_udk = res[0][6]
-            is_date_create = res[0][7]
-            is_date_load = res[0][7]
-            is_authors = res[0][9]
-            is_id_memeber = res[0][10]
-            is_filename = res[0][14]
+    if idissue != -1:
+        # Считываем и готовим данные публикации
+        #                    0       1     2                3            4    5      6       7            8         9          10             11         12        13             14
+        sqlstr = "select id_issue, name, annotation_r, annotation_e, tags_r,tags_e, udk, date_create, date_load, author, id_member_ldr,  statusissue, deleted, id_application, filename from issue where id_issue=%s"
+        cursor.execute(sqlstr,(str(idissue),))
+        res = cursor.fetchall()
+        is_name = res[0][1]
+        is_ann_rus = res[0][2]
+        is_ann_eng = res[0][3]
+        is_tags_rus = res[0][4]
+        is_tags_eng = res[0][5]
+        is_udk = res[0][6]
+        is_date_create = res[0][7]
+        is_date_load = res[0][7]
+        is_authors = res[0][9]
+        is_id_memeber = res[0][10]
+        is_filename = res[0][14]
+        conn.close()
 
-
-
-
-    else:
-
-        if idissue == -1:
-
-
-            sqlstr = "insert into issue (name, annotation_r, annotation_e, tags_r,tags_e,date_create ,date_load,author, id_member_ldr, statusissue, deleted, id_application ) " +\
-                   "           values (%s,      %s,          %s,          %s,    %s,       %s,             %s,    %s,         %s,          %s,         %s,        %s) returning id_issue"
-            cursor.execute(sqlstr, (request.form['name_issue'], request.form['is_ann_rus'], request.form['is_ann_eng'], request.form['is_tags_rus'], request.form['is_tags_eng'], request.form['date_create'],request.form['date_load'], request.form['is_authors'],  session['id_member'], '0', 'Н', session['id_application']))
-            conn.commit()
-            idissue = cursor.fetchall()[0][0]
-            # Сохраним сам файл публикации. Имя - id из таблицы issue (потоп можно сделать каталог по шв конференции
-            is_filename = getInnerFilename(idis)
-            if is_filename != "":
-                sqlstr="update issue set filename = %s where id_issue = %s" 
-                cursor.execute(sqlstr, (is_filename, str(idissue)))
-                conn.commit()
-
-
-        else:
-            sqlstr = "update issue set name = %s, annotation_r = %s,  annotation_e = %s, tags_r = %s, tags_e = %s, date_create=%s, date_load = %s, author = %s, id_member_ldr = %s, statusissue = %s, deleted = %s where id_issue=%s"
-            cursor.execute(sqlstr, (request.form['name_issue'], request.form['is_ann_rus'], request.form['is_ann_eng'], request.form['is_tags_rus'], request.form['is_tags_eng'], request.form['date_create'],request.form['date_load'], request.form['is_authors'],  session['id_member'], '0', 'Н', str(idissue),))
-            conn.commit()
-            is_filename = getInnerFilename(idissue)
-
-    conn.close()
 
     if is_filename is None:
         is_filename = ""
     return render_template( 'editissue.html', ver=app.version,     is_name = is_name, is_ann_rus = is_ann_rus, is_ann_eng = is_ann_eng, is_tags_rus = is_tags_rus, is_tags_eng = is_tags_eng, is_date_create = is_date_create, is_date_load = is_date_load, is_authors = is_authors, is_id_memeber = is_id_memeber, is_filename = is_filename, is_udk=is_udk )
 
 
+@app.route('/editissue/<int:idissue>',methods=['POST'])
+def editissuepost(idissue: int):
+    idconf = session.get('id_application', -1)
+
+    conn = psycopg2.connect(host=app.config['HOSTDATABASE'], user=app.config['USERNAME'],
+                            password=app.config['PASSWORD'], dbname=app.config['DBNAME'])
+    cursor = conn.cursor()
+
+    if idissue == -1:
+
+
+        sqlstr = "insert into issue (name, udk,annotation_r, annotation_e, tags_r,tags_e,date_create ,date_load,author, id_member_ldr, statusissue, deleted, id_application ) " +\
+               "           values (%s,   ,  %s,   %s,          %s,          %s,    %s,       %s,             %s,    %s,         %s,          %s,         %s,        %s) returning id_issue"
+        cursor.execute(sqlstr, (request.form['name_issue'], request.form['is_udk'], request.form['is_ann_rus'], request.form['is_ann_eng'], request.form['is_tags_rus'], request.form['is_tags_eng'], request.form['date_create'],request.form['date_load'], request.form['is_authors'],  session['id_member'], '0', 'Н', session['id_application']))
+        conn.commit()
+        idissue = cursor.fetchall()[0][0]
+        # Сохраним сам файл публикации. Имя - id из таблицы issue (потоп можно сделать каталог по шв конференции
+        is_filename = getInnerFilename(idissue)
+        if is_filename is not None:
+            sqlstr="update issue set filename = %s where id_issue = %s"
+            cursor.execute(sqlstr, (is_filename, str(idissue)))
+            conn.commit()
+            files = request.files['inpfile']
+            files.save(os.path.join(app.config['UPLOAD_FOLDER'], is_filename))
+
+    else:
+        sqlstr = "update issue set name = %s, udk =  %s, annotation_r = %s,  annotation_e = %s, tags_r = %s, tags_e = %s, date_create = %s, date_load = %s, author = %s, id_member_ldr = %s, statusissue = %s, deleted = %s where id_issue=%s"
+        cursor.execute(sqlstr, (request.form['name_issue'], request.form['is_udk'], request.form['is_ann_rus'], request.form['is_ann_eng'], request.form['is_tags_rus'], request.form['is_tags_eng'], request.form['date_create'],request.form['date_load'], request.form['is_authors'],  session['id_member'], '0', 'Н', str(idissue),))
+        conn.commit()
+        is_filename = getInnerFilename(idissue)
+        if is_filename is not None:
+            sqlstr = "update issue set filename = %s where id_issue = %s"
+            cursor.execute(sqlstr, (is_filename, str(idissue)))
+            conn.commit()
+            files = request.files['inpfile']
+            files.save(os.path.join(app.config['UPLOAD_FOLDER'], is_filename))
+
+    conn.close()
+
+
+
+
+    return listissue(1, idconf)
+
+
 def getInnerFilename(idis):
     fn = None
-    if 'file' in request.files :
+    if 'inpfile' in request.files :
         file = request.files['inpfile']
         fn = secure_filename(file.filename)
         if '.' in fn:
@@ -704,5 +720,59 @@ def getInnerFilename(idis):
 
 # **********************************
 
+
+@app.route('/edit_user/<int:id_member>', methods=['GET'])
+def EditUserGet(id_member):
+    conn = psycopg2.connect(host=app.config['HOSTDATABASE'], user=app.config['USERNAME'],
+                            password=app.config['PASSWORD'], dbname=app.config['DBNAME'])
+    cursor = conn.cursor()
+    #               0        1      2        3       4       5      6     7       8         9         10              11            12          13        14
+    cursor.execute(
+        "select id_member, name, surname, famely, birsday, email, sex, phone, add_info, id_company, id_acdegree, id_position, id_acposition, addres, userright, block from members where id_member=%s ",
+        (str(id_member)))
+    res = cursor.fetchall()
+    u_id_member=id_member
+    u_nm = res[0][1]
+    u_sn = res[0][2]
+    u_fml = res[0][3]
+    u_adr = res[0][13]
+    u_id_comp= res[0][9]
+    u_id_uzv = res[0][10]
+    u_em = res[0][5]
+    u_id_dlgn = res[0][11]
+    u_bd = res[0][4]
+    u_sex = res[0][6]
+    u_ph = res[0][7]
+    u_add_info = res[0][8]
+
+    cursor.execute("select id_dict,name from dict where dict_name='орг' order by name")
+    session['res_org'] = cursor.fetchall()
+
+    cursor.execute("select id_dict,name from dict where dict_name='долж' order by name")
+    session['dolgns'] = cursor.fetchall()
+
+    cursor.execute("select id_dict,name from dict where dict_name='учзв' order by name")
+    session['uzvs'] = cursor.fetchall()
+
+    conn.close()
+    return render_template('EditUser.html', ver=app.version,  u_id_member=u_id_member, u_nm=u_nm, u_sn=u_sn, u_fml=u_fml, u_adr=u_adr, u_id_comp=u_id_comp, u_id_uzv=u_id_uzv, u_em=u_em, u_id_dlgn=u_id_dlgn, u_bd=u_bd, u_sex=u_sex, u_ph=u_ph, u_add_info=u_add_info)
+
+
+
+@app.route('/edit_user/<int:id_member>', methods=['Post'])
+def EditUserPost(id_member):
+# имеем делотолько с сущетвующими пользователями
+    conn = psycopg2.connect(host=app.config['HOSTDATABASE'], user=app.config['USERNAME'],
+                            password=app.config['PASSWORD'], dbname=app.config['DBNAME'])
+    cursor = conn.cursor()
+
+
+
+
+
+
 if __name__ == '__main__':
     app.run()
+
+
+
