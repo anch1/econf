@@ -72,6 +72,10 @@ def registry():
     cursor.execute("select id_dict,name from dict where dict_name='учзв' order by name")
     session['uzvs'] = cursor.fetchall()
 
+    cursor.execute("select id_country,name from country  order by name")
+    session['countrylist'] = cursor.fetchall()
+
+
     conn.close()
     return render_template('Registry.html', ver=app.version)
 
@@ -85,6 +89,7 @@ def write_registry():
     session['nm'] = request.form['nm']
     session['fml'] = request.form['fml']
     session['sn'] = request.form['sn']
+    session['country'] = request.form['country']
     session['adr'] = request.form['adr']
     session['comp_nm'] = request.form['comp_nm']
     session['uzv'] = request.form['uzv']
@@ -120,12 +125,12 @@ def write_registry():
         if session['id_member'] == "-1":
             #                                     1      2       3         4           5         6          7         8            9         10   11        12     13    14      15
             cursor.execute(
-                "insert into members(name, surname, famely, id_company, id_acdegree, email, id_position, birsday, id_acposition, sex, phone, add_info, login, pwd, addres) " +
-                "values (%s,   %s,      %s,      %s,          %s,        %s,     %s,          %s,        %s,          %s,  %s,     %s,       %s,  %s,   %s) returning id_member;",
+                "insert into members(name, surname, famely, id_company, id_acdegree, email, id_position, birsday, id_acposition, sex, phone, add_info, login, pwd, addres, id_country) " +
+                "values (%s,   %s,      %s,      %s,          %s,        %s,     %s,          %s,        %s,          %s,  %s,     %s,       %s,  %s,   %s, %s) returning id_member;",
                 (request.form['nm'], request.form['sn'], request.form['fml'], request.form['comp_nm'],
                  request.form['uzv'], request.form['em'], request.form['dlgn'], request.form['bd'], '0',
                  request.form['sex'], request.form['ph'],
-                 request.form['add_info'], request.form['lgn'], request.form['pwd'], request.form['adr'],))
+                 request.form['add_info'], request.form['lgn'], request.form['pwd'], request.form['adr'], request.form['country'],))
             #                                             1                2                     3                     4                     5                 6                      7
             conn.commit()
             res = cursor.fetchall()
@@ -141,12 +146,12 @@ def write_registry():
             # это редактирование своего профиля
             cursor.execute(
                 "update members set name = %s, surname = %s, famely = %s, id_company = %s, id_acdegree = %s, email = %s,         id_position = %s" \
-                ",        birsday = %s,  id_acposition = %s, sex = %s, phone = %s, add_info = %s, login = %s, pwd = %s, addres = %s where id_member = %s",
+                ",        birsday = %s,  id_acposition = %s, sex = %s, phone = %s, add_info = %s, login = %s, pwd = %s, addres = %s, country = %s where id_member = %s",
                 (
                     request.form['nm'], request.form['sn'], request.form['fml'], request.form['comp_nm'],
                     request.form['uzv'], request.form['em'], request.form['dlgn'], request.form['bd'], '0',
                     request.form['sex'], request.form['ph'], request.form['add_info'],
-                    request.form['lgn'], request.form['pwd'], request.form['adr'], request.form['id_member'],))
+                    request.form['lgn'], request.form['pwd'], request.form['adr'], request.form['country'], request.form['id_member'],))
             conn.commit()
             conn.close()
             return render_template('Registry.html', ver=app.version)
@@ -155,7 +160,7 @@ def write_registry():
         return render_template('Registry.html', ver=app.version)
 
 
-@app.route('/login/')
+@app.route('/login/' , methods=['GET'])
 def login():
     session['usrr'] = '00000000000000000000000000'
     return render_template('loginfrm.html', ver=app.version)
@@ -168,7 +173,7 @@ def res_login():
     cursor = conn.cursor()
     #               0        1      2        3       4       5      6     7       8         9         10              11            12          13        14
     cursor.execute(
-        "select id_member, name, surname, famely, birsday, email, sex, phone, add_info, id_company, id_acdegree, id_position, id_acposition, addres, userright from members where login=%s and pwd=%s",
+        "select id_member, name, surname, famely, birsday, email, sex, phone, add_info, id_company, id_acdegree, id_position, id_acposition, addres, userright, id_country from members where login=%s and pwd=%s",
         (request.form['lgn'], request.form['pwd']))
     res = cursor.fetchall()
     if len(res) <= 0:
@@ -201,6 +206,9 @@ def res_login():
         session['usrr'] = res[0][14]
         session['lgn'] = request.form['lgn']
         session['pwd'] = request.form['pwd']
+        session['country'] = res[0][15]
+        if session['country'] is None:
+            session['country'] = -1
         conn.close()
         return render_template('welcome.html', ver=app.version)
 
@@ -226,6 +234,7 @@ def logout():
     session['add_info'] = ""
     session['lgn'] = ""
     session['pwd'] = ""
+    session['country'] = ""
     app.enter_enabled = True
     refresh_menu()
     return render_template('logout.html', ver=app.version, name_out=no)
@@ -752,6 +761,10 @@ def EditUserGet(nompage,id_member):
 
     cursor.execute("select id_dict,name from dict where dict_name='учзв' order by name")
     session['uzvs'] = cursor.fetchall()
+
+    cursor.execute("select id_country,name from country  order by name")
+    session['countrylist'] = cursor.fetchall()
+
 
     conn.close()
     return render_template('EditUser.html', ver=app.version,  u_id_member=u_id_member, u_nm=u_nm, u_sn=u_sn, u_fml=u_fml, u_adr=u_adr, u_id_comp=u_id_comp, u_id_uzv=u_id_uzv, u_em=u_em, u_id_dlgn=u_id_dlgn, u_bd=u_bd, u_sex=u_sex, u_ph=u_ph, u_add_info=u_add_info, u_block=u_block)
