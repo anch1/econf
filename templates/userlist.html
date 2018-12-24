@@ -66,17 +66,17 @@
                             </tfoot>
 
                             {% for s in session.userlist %}
-                                <tr >
+                                <tr {%if s[11]!='Б'%} class ="unblokeduser" {% else %} class ="blokeduser" {% endif %} >
                                     <td class="headulist">
                                         {% if session['usrr'][1]=='1' %}
-                                            <a href='/edit_user/{{ s[0]}}'>{{ s[1]+" "+s[2]+" "+s[3] }}</a> <!-- фио -->
+                                            <a href='/edit_user/{{ session['userlist_nompage'] }}/{{ s[0]}}'>{{ s[1]+" "+s[2]+" "+s[3] }}</a> <!-- фио -->
                                         {% else %}
                                             {{ s[1]+" "+s[2]+" "+s[3] }}
                                         {% endif %}
                                     </td>
                                     <td class="headulist">
                                         {% if session['usrr'][1]=='1' %}
-                                            <a href='/edit_user/{{ s[0]}}'>{{ s[9] }}</a>   <!-- acdegrname -->
+                                            <a href='/edit_user/{{ session['userlist_nompage'] }}/{{ s[0]}}'>{{ s[9] }}</a>   <!-- acdegrname -->
                                         {% else %}
                                             {{ s[9] }}
                                         {% endif %}
@@ -84,28 +84,28 @@
 
                                     <td class="headulist">
                                         {% if session['usrr'][1]=='1' %}
-                                            <a href='/edit_user/{{ s[0]}}'>{{ s[7] }}</a>   <!--!compname -->
+                                            <a href='/edit_user/{{ session['userlist_nompage'] }}/{{ s[0]}}'>{{ s[7] }}</a>   <!--!compname -->
                                         {% else %}
                                             {{ s[7] }}
                                         {% endif %}
                                     </td>
                                     <td class="headulist">
                                         {% if session['usrr'][1]=='1' %}
-                                            <a href='/edit_user/{{ s[0]}}'>{{ s[8] }}</a>   <!-- posname -->
+                                            <a href='/edit_user/{{ session['userlist_nompage'] }}/{{ s[0]}}'>{{ s[8] }}</a>   <!-- posname -->
                                         {% else %}
                                             {{ s[8] }}
                                         {% endif %}
                                     </td>
                                     <td class="headulist">
                                         {% if session['usrr'][1]=='1' %}
-                                            <a href='/edit_user/{{ s[0]}}'>{{ s[10] }}</a>  <!-- addres -->
+                                            <a href='/edit_user/{{ session['userlist_nompage'] }}/{{ s[0]}}'>{{ s[10] }}</a>  <!-- addres -->
                                         {% else %}
                                             {{ s[10] }}
                                         {% endif %}
                                     </td>
                                     <td class="headulist">
                                         {% if session['usrr'][1]=='1' %}
-                                            <a href='/deleteuser/{{ s[0]}}'>Удалить</a>
+                                            <a href='/deleteuser/{{ session['userlist_nompage'] }}/{{ s[0]}}'>Удалить</a>
                                         {% endif %}
                                     </td>
 
