@@ -40,7 +40,7 @@ def mainwindow():
     return render_template('BasePage.html', ver=app.version)
 
 
-@app.route('/registration/')
+@app.route('/registration/', methods=['GET'])
 def registry():
     session['res_reg'] = False
     session['errorstr'] = ""
@@ -63,21 +63,9 @@ def registry():
     conn = psycopg2.connect(host=app.config['HOSTDATABASE'], user=app.config['USERNAME'],
                             password=app.config['PASSWORD'], dbname=app.config['DBNAME'])
     cursor = conn.cursor()
-    cursor.execute("select id_dict,name from dict where dict_name='орг' order by name")
-    session['res_org'] = cursor.fetchall()
-
-    cursor.execute("select id_dict,name from dict where dict_name='долж' order by name")
-    session['dolgns'] = cursor.fetchall()
-
-    cursor.execute("select id_dict,name from dict where dict_name='учзв' order by name")
-    session['uzvs'] = cursor.fetchall()
-
-    cursor.execute("select id_country,name from country  order by name")
-    session['countrylist'] = cursor.fetchall()
-
-
+    makecombolists(cursor)
     conn.close()
-    return render_template('Registry.html', ver=app.version)
+    return render_template('Registry.html', ver=app.version, countrylst=countrylst)
 
 
 @app.route('/registration/', methods=['POST'])
@@ -146,21 +134,23 @@ def write_registry():
             # это редактирование своего профиля
             cursor.execute(
                 "update members set name = %s, surname = %s, famely = %s, id_company = %s, id_acdegree = %s, email = %s,         id_position = %s" \
-                ",        birsday = %s,  id_acposition = %s, sex = %s, phone = %s, add_info = %s, login = %s, pwd = %s, addres = %s, country = %s where id_member = %s",
+                ",        birsday = %s,  id_acposition = %s, sex = %s, phone = %s, add_info = %s, login = %s, pwd = %s, addres = %s, id_country = %s where id_member = %s",
                 (
                     request.form['nm'], request.form['sn'], request.form['fml'], request.form['comp_nm'],
                     request.form['uzv'], request.form['em'], request.form['dlgn'], request.form['bd'], '0',
                     request.form['sex'], request.form['ph'], request.form['add_info'],
                     request.form['lgn'], request.form['pwd'], request.form['adr'], request.form['country'], request.form['id_member'],))
             conn.commit()
+            makecombolists(cursor)
             conn.close()
-            return render_template('Registry.html', ver=app.version)
+            return render_template('Registry.html', ver=app.version, countrylst = countrylst)
     else:
+        makecombolists(cursor)
         conn.close()
-        return render_template('Registry.html', ver=app.version)
+        return render_template('Registry.html', ver=app.version, countrylst = countrylst)
 
 
-@app.route('/login/' , methods=['GET'])
+@app.route('/login/', methods=['GET'])
 def login():
     session['usrr'] = '00000000000000000000000000'
     return render_template('loginfrm.html', ver=app.version)
@@ -477,7 +467,12 @@ def edit_application(id_application):
 
 @app.route('/edit_profil/')
 def edit_profil():
-    return render_template('Registry.html', ver=app.version, regim='edit')
+    conn = psycopg2.connect(host=app.config['HOSTDATABASE'], user=app.config['USERNAME'],
+                            password=app.config['PASSWORD'], dbname=app.config['DBNAME'])
+    cursor = conn.cursor()
+    makecombolists(cursor)
+    conn.close()
+    return render_template('Registry.html', ver=app.version, regim='edit', countrylst = countrylst)
 
 
 @app.route('/edit_profil/', methods=['POST'])
@@ -753,25 +748,17 @@ def EditUserGet(nompage,id_member):
     u_add_info = res[0][8]
     u_block = res[0][15]
 
-    cursor.execute("select id_dict,name from dict where dict_name='орг' order by name")
-    session['res_org'] = cursor.fetchall()
-
-    cursor.execute("select id_dict,name from dict where dict_name='долж' order by name")
-    session['dolgns'] = cursor.fetchall()
-
-    cursor.execute("select id_dict,name from dict where dict_name='учзв' order by name")
-    session['uzvs'] = cursor.fetchall()
-
-    cursor.execute("select id_country,name from country  order by name")
-    session['countrylist'] = cursor.fetchall()
-
+    makecombolists(cursor)
 
     conn.close()
-    return render_template('EditUser.html', ver=app.version,  u_id_member=u_id_member, u_nm=u_nm, u_sn=u_sn, u_fml=u_fml, u_adr=u_adr, u_id_comp=u_id_comp, u_id_uzv=u_id_uzv, u_em=u_em, u_id_dlgn=u_id_dlgn, u_bd=u_bd, u_sex=u_sex, u_ph=u_ph, u_add_info=u_add_info, u_block=u_block)
+    for key in list(session.keys()):
+        print(key)
+    return render_template('EditUser.html', ver=app.version,  u_id_member=u_id_member, u_nm=u_nm, u_sn=u_sn, u_fml=u_fml, u_adr=u_adr, u_id_comp=u_id_comp, u_id_uzv=u_id_uzv, u_em=u_em, u_id_dlgn=u_id_dlgn, u_bd=u_bd, u_sex=u_sex, u_ph=u_ph,
+                           u_add_info=u_add_info, u_block=u_block, countrylst=countrylst)
 
 
 @app.route('/edit_user/<int:nompage>/<int:id_member>', methods=['POST'])
-def EditUserPost(nompage,id_member):
+def EditUserPost(nompage, id_member):
     conn = psycopg2.connect(host=app.config['HOSTDATABASE'], user=app.config['USERNAME'],
                             password=app.config['PASSWORD'], dbname=app.config['DBNAME'])
     cursor = conn.cursor()
@@ -779,13 +766,25 @@ def EditUserPost(nompage,id_member):
     cursor.execute(
         "update members set  name = %s, surname = %s, famely = %s, birsday = %s, email = %s, sex = %s,        phone = %s,        add_info = %s, id_company = %s,  id_acdegree = %s, id_position = %s, addres = %s, block  = %s where id_member=%s ",
         (      request.form['nm'], request.form['sn'], request.form['fml'], request.form['bd'], request.form['em'], request.form['sex'], request.form['ph'],
-               request.form['add_info'], request.form['comp_nm'], request.form['uzv'], request.form['dlgn'], request.form['adr'],   request.form['blk'], str(id_member)))
+               request.form['u_add_info'], request.form['comp_nm'], request.form['uzv'], request.form['dlgn'], request.form['adr'],   request.form['blk'], str(id_member)))
     conn.commit()
     conn.close()
     return  userlist(nompage)
 
+def makecombolists(cursr):
+    cursr.execute("select id_dict,name from dict where dict_name='орг' order by name")
+    session['res_org'] = cursr.fetchall()
 
+    cursr.execute("select id_dict,name from dict where dict_name='долж' order by name")
+    session['dolgns'] = cursr.fetchall()
 
+    cursr.execute("select id_dict,name from dict where dict_name='учзв' order by name")
+    session['uzvs'] = cursr.fetchall()
+
+    cursr.execute("select id_country,name from country  order by name ")
+    global countrylst
+    countrylst = cursr.fetchall()
+    return 0
 
 
 
