@@ -2,6 +2,7 @@ import os
 from typing import Any, Union
 from datetime import datetime, date, time
 import psycopg2
+import smtplib
 from flask import Flask, request, render_template, session, redirect, Markup, url_for
 from werkzeug.utils import secure_filename
 
@@ -88,7 +89,6 @@ def write_registry():
     session['ph'] = request.form['ph']
     session['add_info'] = request.form['add_info']
     session['lgn'] = request.form['lgn']
-    session['pwd'] = request.form['pwd']
     session['id_member'] = request.form['id_member']
 
     conn = psycopg2.connect(host=app.config['HOSTDATABASE'], user=app.config['USERNAME'],
@@ -202,6 +202,25 @@ def res_login():
         conn.close()
         return render_template('welcome.html', ver=app.version)
 
+
+@app.route('/recallpwdfrm/', methods=['GET'])
+def recallpwd():
+
+    return render_template('RecallPwd.html', ver=app.version)
+
+@app.route('/recallpwdfrm/', methods=['post'])
+def recallpwd():
+    sqlstr = "select email from members where login = %s"
+    conn = psycopg2.connect(host=app.config['HOSTDATABASE'], user=app.config['USERNAME'],
+                            password=app.config['PASSWORD'], dbname=app.config['DBNAME'])
+    cursor = conn.cursor()
+    cursor.execute(sqlstr,( request.form['lgn'] ))
+    res=cursor.fetchall()
+    if res.size == 1:
+        smtpObj = smtplib.SMTP('smtp.gmail.com', 587)
+
+
+    return render_template('message.html', ver=app.version, message='Пароль отправлен на email указанный для логина', urlret="\")
 
 @app.route('/logout/')
 def logout():
@@ -371,8 +390,8 @@ def edit_application(id_application):
                 conn.commit()
                 res = cursor.fetchall()
             else:
-                sqlstr = "update application set theme = %s, id_company = %s, id_sciency = %s, datefrom = %s, dateto = %s, dateatticle = %s, datedecision = %s, id_member = %s, describe_conf = %s,orgcom_conf = %s , statusapplication = %s , id_moderator = %s " \
-                         "where id_application = " + str(session['app_id_application'])
+                sqlstr = " update application set theme = %s, id_company = %s, id_sciency = %s, datefrom = %s, dateto = %s, dateatticle = %s, datedecision = %s, id_member = %s, describe_conf = %s,orgcom_conf = %s , statusapplication = %s , id_moderator = %s " \
+                         " where id_application = " + str(session['app_id_application'])
                 cursor.execute(sqlstr,
                                (
                                    request.form['theme'], request.form['comp_app'], request.form['type_sc'],
@@ -659,7 +678,7 @@ def editissueget(idissue: int):
 
     if is_filename is None:
         is_filename = ""
-    return render_template( 'editissue.html', ver=app.version,     is_name = is_name, is_ann_rus = is_ann_rus, is_ann_eng = is_ann_eng, is_tags_rus = is_tags_rus, is_tags_eng = is_tags_eng, is_date_create = is_date_create, is_date_load = is_date_load, is_authors = is_authors, is_id_memeber = is_id_memeber, is_filename = is_filename, is_udk=is_udk )
+    return render_template('editissue.html', ver=app.version,     is_name = is_name, is_ann_rus = is_ann_rus, is_ann_eng = is_ann_eng, is_tags_rus = is_tags_rus, is_tags_eng = is_tags_eng, is_date_create = is_date_create, is_date_load = is_date_load, is_authors = is_authors, is_id_memeber = is_id_memeber, is_filename = is_filename, is_udk=is_udk )
 
 
 @app.route('/editissue/<int:idissue>',methods=['POST'])

@@ -49,7 +49,7 @@
 -->            <input hidden value="{{ session.id_member }}" id="id_member" type="text" name="id_member">
 
                     <table id = "regtable">
-                        {% if session['regim']=='edit' %}
+                        {% if regim|string()=='edit'|string() %}
                             <caption>Изменение данных профиля</caption>
                         {% else %}
                                 <caption>Регистрация пользователя <br/>{{ session.errorstr }} </caption>
@@ -209,13 +209,7 @@
 
                                     </select>
                                 </td>
-
-
-
-
-
                             </tr>
-
 
                             <tr>
                                 <td>
@@ -265,7 +259,11 @@
                             </tr>
                             <tr class="rowcenter">
                                 <td colspan="2" >
-                                    <input type="submit" tabindex="16" value="Регистрация" name="sub">
+                                     {% if regim|string()=='edit'|string() %}
+                                        <input type="submit" tabindex="16" value="Сохранить" name="sub">
+                                     {% else %}
+                                        <input type="submit" tabindex="16" value="Регистрация" name="sub">
+                                     {% endif %}
                                 </td>
 
                                 <td colspan="2" >

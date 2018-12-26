@@ -70,8 +70,16 @@ body    {
     border: 1px solid black;
     border-radius: 5px;
         }
-
-
+.prcnt30{
+    width:32.5%;
+    float:left;
+    hight:5;
+}
+.prcnt30a{
+    width:auto;
+    float:left;
+    hight:5;
+}
 .content-box{
             margin-top:10px;
             margin-left:10px;
