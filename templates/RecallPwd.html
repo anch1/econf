@@ -1,0 +1,38 @@
+{% extends "BasePage.html" %}
+{% block content %}
+    <div class="prcnt30">
+    &nbsp
+    </div>
+    <div class="prcnt30" >
+        <form action="" method="post" class="login">
+            <table id = "recallpwdtable" align="center">
+                <caption>Восстановление пароля шаг 1</caption>
+                <tr>
+                    <td> &nbsp </td>
+                    <td>
+                        <label for="lgn">Логин </label>
+                    </td>
+                    <td>
+                        <input value="" autofocus required tabindex="1" id="lgn" type="text" name="lgn" size="15" placeholder="Строка для входа на сайт" title="Строка для входа на сайт">
+                    </td>
+                    <td> &nbsp </td>
+                </tr>
+                <tr>
+                    <td>&nbsp</td>
+                    <td align="center">
+                        <input type="submit" tabindex="3" value="Дальше" name="enter">
+                    </td>
+
+                    <td align="center">
+                         <input type="button" tabindex="4" value="Отмена" name="break_enter" onclick="location.href='/' ">
+                    </td>
+                    <td> &nbsp </td>
+                </tr>
+            </table>
+
+        </form>
+    </div>
+    &nbsp
+    <div class="prcnt30a">
+    </div>
+{% endblock %}
