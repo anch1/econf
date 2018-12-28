@@ -209,18 +209,22 @@ def recallpwd():
     return render_template('RecallPwd.html', ver=app.version)
 
 @app.route('/recallpwdfrm/', methods=['post'])
-def recallpwd():
+def recallpwdpost():
     sqlstr = "select email from members where login = %s"
     conn = psycopg2.connect(host=app.config['HOSTDATABASE'], user=app.config['USERNAME'],
                             password=app.config['PASSWORD'], dbname=app.config['DBNAME'])
     cursor = conn.cursor()
-    cursor.execute(sqlstr,( request.form['lgn'] ))
-    res=cursor.fetchall()
-    if res.size == 1:
+    cursor.execute(sqlstr, (request.form['lgn'],))
+    res = cursor.fetchall()
+    if len(res) == 1:
         smtpObj = smtplib.SMTP('smtp.gmail.com', 587)
+        smtpObj.starttls()
+        smtpObj.login('elcon66.adm@gmail.com', 'tom321jerry')
+        smtpObj.sendmail("elcon66.adm@gmail.com", "anch1@mail.ru", "go to bed!")
+        smtpObj.quit()
 
 
-    return render_template('message.html', ver=app.version, message='Пароль отправлен на email указанный для логина', urlret="\")
+    return render_template('message.html', ver=app.version, message='Пароль отправлен на email указанный для логина', urlret='/')
 
 @app.route('/logout/')
 def logout():
