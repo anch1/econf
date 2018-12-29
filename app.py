@@ -5,7 +5,7 @@ import psycopg2
 import smtplib
 from flask import Flask, request, render_template, session, redirect, Markup, url_for
 from werkzeug.utils import secure_filename
-
+from email.mime.text import MIMEText
 app = Flask(__name__)
 
 app.config['DEBUG'] = True
@@ -210,7 +210,7 @@ def recallpwd():
 
 @app.route('/recallpwdfrm/', methods=['post'])
 def recallpwdpost():
-    sqlstr = "select email from members where login = %s"
+    sqlstr = "select email,  from members where login = %s"
     conn = psycopg2.connect(host=app.config['HOSTDATABASE'], user=app.config['USERNAME'],
                             password=app.config['PASSWORD'], dbname=app.config['DBNAME'])
     cursor = conn.cursor()
@@ -218,9 +218,17 @@ def recallpwdpost():
     res = cursor.fetchall()
     if len(res) == 1:
         smtpObj = smtplib.SMTP('smtp.gmail.com', 587)
+#        smtpObj = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+        smtpObj.ehlo()
         smtpObj.starttls()
+        smtpObj.ehlo()
         smtpObj.login('elcon66.adm@gmail.com', 'tom321jerry')
-        smtpObj.sendmail("elcon66.adm@gmail.com", "anch1@mail.ru", "go to bed!")
+        msg = ["From: elcon66.adm@gmail.com",
+               "To: anch1@mail.ru",
+                "Subject: tema"]
+        msg = "\r\n".join(msg)
+#        msg=msg+"\r\n это собсно сам текст письма"
+        smtpObj.sendmail("elcon66.adm@gmail.com", "anch1@mail.ru", msg+MIMEText("\r\n Это дурацкое письмо ", 'plain', 'utf-8').as_string())
         smtpObj.quit()
 
 
