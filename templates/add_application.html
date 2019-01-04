@@ -57,23 +57,23 @@
     <form id="ed_application" action="" method="post" onsubmit="return validateForm()" class="ed_application">
 <!--          <center>
             <fieldset class ="fst" >
--->            <input hidden value="{{ session.app_id_application }}" id="id_application" type="text" name="id_application">
+-->            <input hidden value="{{ applic.app_id_application }}" id="id_application" type="text" name="id_application">
 
                     <table id = "edapplicationtable">
-                        {% if session['app_id_application']!=-1 %}
+                        {% if applic['app_id_application']!=-1 %}
                             <caption>Изменение данных заявки</caption>
                         {% else %}
                             <caption >Новая заявка</caption>
                         {% endif %}
-                        {% if session['errstr_application']!=""  %}
-                            <caption>{{ session.errstr_application }}</caption>
+                        {% if applic['errstr_application']!=""  %}
+                            <caption>{{ applic.errstr_application }}</caption>
                         {% endif %}
                         <tr>
                             <td>
                                 <label for="theme">Тема конференции</label>
                             </td>
                             <td colspan="3">
-                                <input class="inpapp" autofocus required tabindex="1" id="theme" type="text" name="theme" value="{{ session.app_theme }}"  {{ session.app_disabled }}>
+                                <input class="inpapp" autofocus required tabindex="1" id="theme" type="text" name="theme" value="{{ applic.app_theme }}"  {{ session.app_disabled }}>
                             </td>
                         </tr>
                         <tr>
@@ -81,18 +81,16 @@
                                 <label for="user_app">Организатор мероприятия</label>
                             </td>
                             <td>
-<!--                                <input class="inpapp" value="{{ session.app_username }}" tabindex="1" id="user_app" type="text" name="user_app" title="Лицо, сформировавшее заявку" disabled>
--->
 
                                 <select class="selapp" tabindex="2" id="user_app" name="user_app" size="1" {{ session.app_disabled }} >
-                                    {% if session.app_id_member==-1 %}
+                                    {% if applic.app_id_member==-1 %}
                                         <option selected value=-1>не указано</option>
                                     {% else %}
                                         <option  value=-1>не указано</option>
                                     {% endif %}
 
                                     {% for tsc in session.app_members %}
-                                        {% if tsc[0]==session.app_id_member %}
+                                        {% if tsc[0]==applic.app_id_member %}
                                             <option selected value={{ tsc[0] }}>{{ tsc[1] }}</option>
                                         {% else %}
                                             <option value={{ tsc[0] }}>{{ tsc[1] }}</option>
@@ -109,14 +107,14 @@
 <!--                                <input class="inpapp" value="{{ session.company }}" required tabindex="8" id="company" type="text" name="company"  disabled >
 -->
                                 <select class="selapp" tabindex="3" id="comp_app" name="comp_app" size="1" {{ session.app_disabled }} >
-                                    {% if session.app_id_company==-1 %}
+                                    {% if applic.app_id_company==-1 %}
                                         <option selected value=-1>не указано</option>
                                     {% else %}
                                         <option  value=-1>не указано</option>
                                     {% endif %}
 
                                     {% for tsc in session.app_companies %}
-                                        {% if tsc[0]==session.app_id_company %}
+                                        {% if tsc[0]==applic.app_id_company %}
                                             <option selected value={{ tsc[0] }}>{{ tsc[1] }}</option>
                                         {% else %}
                                             <option value={{ tsc[0] }}>{{ tsc[1] }}</option>
@@ -128,6 +126,63 @@
 
 
 
+                        </tr>
+                        <tr>
+                            <td colspan="4" >
+                                <table class="sectionTable" >
+                                        <caption>Секции конференции<br/>   <a href="/add_section/" >Добавить секцию</a> </caption>
+                                        <tr>
+                                            <th>
+                                                Наименование секции
+                                            </th>
+                                            <th>
+                                                Модератор
+                                            </th>
+                                            <th>
+                                                Действия
+                                            </th>
+
+                                        </tr>
+
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="3">
+                                                    <div class="pagerow">
+
+                                                        {% if (pages['sectlist_nompage']==1) %}
+                                                            <a class='nextprew' href='/listissue/1/{{id_application}}'>Пред</a>
+                                                        {% else %}
+                                                            <a class='nextprew' href='/listissue/{{ pages.sectlist_nompage-1 }}/{{id_application}}'>Пред</a>
+                                                        {% endif %}
+
+                                                        {% for pg in pages['nmsectpages'] %}
+                                                            {% if pg!=pages['sectlist_nompage'] %}
+                                                                <a class='page' href='/listissue/{{ pg}}/{{id_application}}'>{{ pg }}</a>
+                                                            {% else %}
+                                                                <a class="currentpage" href='/listissue/{{ pg}}/{{id_application}}'>{{ pg }}</a>
+                                                            {% endif %}
+
+                                                        {% endfor %}
+
+                                                        <a class='nextprew' href='/listissue/{%if pages.sectlist_nompage>=pages.sectlist_maxpage%}{{pages.sectlist_maxpage}}{% else %}{{ pages.sectlist_nompage+1}}{%endif%}/{{id_application}}'>След</a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                        <tr>
+                                            <td>
+                                               1244cc4c4 c5
+                                            </td>
+                                            <td>
+                                                 14343 141t
+                                            </td>
+                                            <td>
+                                                1 t43 c5t 5t5t
+                                            </td>
+                                        </tr>
+
+                                </table>
+                            </td>
                         </tr>
                         <tr>
                             <td>
@@ -158,13 +213,13 @@
                                 <label for="date_from">Период проведения конф. с</label>
                             </td>
                             <td>
-                                <input class="inpapp" required tabindex="5" value="{{ session.app_date_from }}" id="date_from" type="date" name="date_from" title="Дата начала конференции" {{ session.app_disabled }}>
+                                <input class="inpapp" required tabindex="5" value="{{ applic.app_date_from }}" id="date_from" type="date" name="date_from" title="Дата начала конференции" {{ session.app_disabled }}>
                             </td>
                             <td>
                                 <label for="date_to">по </label>
                             </td>
                             <td>
-                                <input  class="inpapp" value="{{ session.app_date_to }}" required tabindex="6" id="date_to" type="date" name="date_to"  {{ session.app_disabled }}>
+                                <input  class="inpapp" value="{{ applic.app_date_to }}" required tabindex="6" id="date_to" type="date" name="date_to"  {{ session.app_disabled }}>
                             </td>
                         </tr>
                         <tr>
@@ -172,13 +227,13 @@
                                 <label for="dline_issue">Срок подачи статей и докладов</label>
                             </td>
                             <td>
-                                <input class="inpapp" value="{{ session.app_dline_issue }}" required tabindex="7" id="dline_issue" type="date" name="dline_issue" {{ session.app_disabled }} >
+                                <input class="inpapp" value="{{ applic.app_dline_issue }}" required tabindex="7" id="dline_issue" type="date" name="dline_issue" {{ session.app_disabled }} >
                             </td>
                             <td>
                                 <label for="dline_decision"> Срок принятия решения <br/>по результатам</label>
                             </td>
                             <td>
-                                <input  class="inpapp" value="{{ session.app_dline_decision  }}"  required tabindex="8" id="dline_decision" type="date" name="dline_decision" {{ session.app_disabled }} >
+                                <input  class="inpapp" value="{{ applic.app_dline_decision  }}"  required tabindex="8" id="dline_decision" type="date" name="dline_decision" {{ session.app_disabled }} >
                             </td>
                         </tr>
 
@@ -239,7 +294,7 @@
                         <tr class="rowcenter">
                             <td colspan="4" >
                                  <textarea  id="descr_konf"  tabindex="11"  cols="80" rows="10" name="descr_konf" {{ session.app_disabled }} >
-                                     {{ session.app_descr_konf }}
+                                     {{ applic.app_descr_konf }}
                                  </textarea>
                             </td>
                         </tr>
@@ -256,7 +311,7 @@
                             <td colspan="4">
 
                                  <textarea  id="orgcom"  tabindex="12" cols="80" rows="10" name="orgcom" {{ session.app_disabled }}>
-                                     {{ session.app_orgcom }}
+                                     {{ applic.app_orgcom }}
                                  </textarea>
                             </td>
                         </tr>

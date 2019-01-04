@@ -31,6 +31,10 @@
 
                                 <th>
                                     Код УДК
+                                </th>
+                                <th>
+                                    Статус
+                                </th>
                                 <th>
                                     Действия
                                 </th>
@@ -65,20 +69,17 @@
                             {% for s in session.islist %}
                                 <tr>
                                     <td>
-                                         <a href='/editissue/{{ s[0]}}'>{{ s[1] }}</a> <!-- тема -->
+                                         <a href='/editissue/{{ s[0]}}'>{{ s[1] }}</a> <!-- наименование-->
                                     </td>
                                     <td>
-                                        <a href='/editissue/{{ s[0]}}'>{{ s[2] }}</a>   <!-- организация -->
+                                        <a href='/editissue/{{ s[0]}}'>{{ s[2] }}</a>   <!-- Авторы -->
                                     </td>
 
                                     <td>
-                                        <a href='/editissue/{{ s[0]}}'> {{ s[5] }}</a>   <!--!compname -->
+                                        <a href='/editissue/{{ s[0]}}'> {{ s[5] }}</a>   <!--удк -->
                                     </td>
                                     <td>
-                                        <a href='/editissue/{{ s[0]}}'>{{ s[8] }}</a>   <!-- дата подачи статей-->
-                                    </td>
-                                    <td>
-                                        <a href='/editissue/{{ s[0]}}'>{{ s[7] }}</a>  <!-- конт лицо-->
+                                        <a href='/editissue/{{ s[0]}}'>{{ s[7] }}</a>  <!-- статус публикации-->
                                     </td>
                                     <td>
                                         

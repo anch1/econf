@@ -2,9 +2,10 @@ import os
 from typing import Any, Union
 from datetime import datetime, date, time
 import psycopg2
+import smtplib
 from flask import Flask, request, render_template, session, redirect, Markup, url_for
 from werkzeug.utils import secure_filename
-
+from email.mime.text import MIMEText
 app = Flask(__name__)
 
 app.config['DEBUG'] = True
@@ -37,10 +38,10 @@ def mainwindow():
     session['pwdminlenth'] = 6
     session['usrr'] = session.get('usrr', '00000000000000000000000000')
     session['is_auth'] = session.get('is_auth', False)
-    return render_template('BasePage.html')
+    return render_template('BasePage.html', ver=app.version)
 
 
-@app.route('/registration/')
+@app.route('/registration/', methods=['GET'])
 def registry():
     session['res_reg'] = False
     session['errorstr'] = ""
@@ -63,17 +64,9 @@ def registry():
     conn = psycopg2.connect(host=app.config['HOSTDATABASE'], user=app.config['USERNAME'],
                             password=app.config['PASSWORD'], dbname=app.config['DBNAME'])
     cursor = conn.cursor()
-    cursor.execute("select id_dict,name from dict where dict_name='орг' order by name")
-    session['res_org'] = cursor.fetchall()
-
-    cursor.execute("select id_dict,name from dict where dict_name='долж' order by name")
-    session['dolgns'] = cursor.fetchall()
-
-    cursor.execute("select id_dict,name from dict where dict_name='учзв' order by name")
-    session['uzvs'] = cursor.fetchall()
-
+    makecombolists(cursor)
     conn.close()
-    return render_template('Registry.html', ver=app.version)
+    return render_template('Registry.html', ver=app.version, countrylst=countrylst)
 
 
 @app.route('/registration/', methods=['POST'])
@@ -85,6 +78,7 @@ def write_registry():
     session['nm'] = request.form['nm']
     session['fml'] = request.form['fml']
     session['sn'] = request.form['sn']
+    session['country'] = request.form['country']
     session['adr'] = request.form['adr']
     session['comp_nm'] = request.form['comp_nm']
     session['uzv'] = request.form['uzv']
@@ -95,7 +89,6 @@ def write_registry():
     session['ph'] = request.form['ph']
     session['add_info'] = request.form['add_info']
     session['lgn'] = request.form['lgn']
-    session['pwd'] = request.form['pwd']
     session['id_member'] = request.form['id_member']
 
     conn = psycopg2.connect(host=app.config['HOSTDATABASE'], user=app.config['USERNAME'],
@@ -120,12 +113,12 @@ def write_registry():
         if session['id_member'] == "-1":
             #                                     1      2       3         4           5         6          7         8            9         10   11        12     13    14      15
             cursor.execute(
-                "insert into members(name, surname, famely, id_company, id_acdegree, email, id_position, birsday, id_acposition, sex, phone, add_info, login, pwd, addres) " +
-                "values (%s,   %s,      %s,      %s,          %s,        %s,     %s,          %s,        %s,          %s,  %s,     %s,       %s,  %s,   %s) returning id_member;",
+                "insert into members(name, surname, famely, id_company, id_acdegree, email, id_position, birsday, id_acposition, sex, phone, add_info, login, pwd, addres, id_country) " +
+                "values (%s,   %s,      %s,      %s,          %s,        %s,     %s,          %s,        %s,          %s,  %s,     %s,       %s,  %s,   %s, %s) returning id_member;",
                 (request.form['nm'], request.form['sn'], request.form['fml'], request.form['comp_nm'],
                  request.form['uzv'], request.form['em'], request.form['dlgn'], request.form['bd'], '0',
                  request.form['sex'], request.form['ph'],
-                 request.form['add_info'], request.form['lgn'], request.form['pwd'], request.form['adr'],))
+                 request.form['add_info'], request.form['lgn'], request.form['pwd'], request.form['adr'], request.form['country'],))
             #                                             1                2                     3                     4                     5                 6                      7
             conn.commit()
             res = cursor.fetchall()
@@ -141,21 +134,23 @@ def write_registry():
             # это редактирование своего профиля
             cursor.execute(
                 "update members set name = %s, surname = %s, famely = %s, id_company = %s, id_acdegree = %s, email = %s,         id_position = %s" \
-                ",        birsday = %s,  id_acposition = %s, sex = %s, phone = %s, add_info = %s, login = %s, pwd = %s, addres = %s where id_member = %s",
+                ",        birsday = %s,  id_acposition = %s, sex = %s, phone = %s, add_info = %s, login = %s, pwd = %s, addres = %s, id_country = %s where id_member = %s",
                 (
                     request.form['nm'], request.form['sn'], request.form['fml'], request.form['comp_nm'],
                     request.form['uzv'], request.form['em'], request.form['dlgn'], request.form['bd'], '0',
                     request.form['sex'], request.form['ph'], request.form['add_info'],
-                    request.form['lgn'], request.form['pwd'], request.form['adr'], request.form['id_member'],))
+                    request.form['lgn'], request.form['pwd'], request.form['adr'], request.form['country'], request.form['id_member'],))
             conn.commit()
+            makecombolists(cursor)
             conn.close()
-            return render_template('Registry.html', ver=app.version)
+            return render_template('Registry.html', ver=app.version, countrylst = countrylst)
     else:
+        makecombolists(cursor)
         conn.close()
-        return render_template('Registry.html', ver=app.version)
+        return render_template('Registry.html', ver=app.version, countrylst = countrylst)
 
 
-@app.route('/login/')
+@app.route('/login/', methods=['GET'])
 def login():
     session['usrr'] = '00000000000000000000000000'
     return render_template('loginfrm.html', ver=app.version)
@@ -168,7 +163,7 @@ def res_login():
     cursor = conn.cursor()
     #               0        1      2        3       4       5      6     7       8         9         10              11            12          13        14
     cursor.execute(
-        "select id_member, name, surname, famely, birsday, email, sex, phone, add_info, id_company, id_acdegree, id_position, id_acposition, addres, userright from members where login=%s and pwd=%s",
+        "select id_member, name, surname, famely, birsday, email, sex, phone, add_info, id_company, id_acdegree, id_position, id_acposition, addres, userright, id_country from members where login=%s and pwd=%s",
         (request.form['lgn'], request.form['pwd']))
     res = cursor.fetchall()
     if len(res) <= 0:
@@ -201,9 +196,43 @@ def res_login():
         session['usrr'] = res[0][14]
         session['lgn'] = request.form['lgn']
         session['pwd'] = request.form['pwd']
+        session['country'] = res[0][15]
+        if session['country'] is None:
+            session['country'] = -1
         conn.close()
         return render_template('welcome.html', ver=app.version)
 
+
+@app.route('/recallpwdfrm/', methods=['GET'])
+def recallpwd():
+
+    return render_template('RecallPwd.html', ver=app.version)
+
+@app.route('/recallpwdfrm/', methods=['post'])
+def recallpwdpost():
+    sqlstr = "select email,  from members where login = %s"
+    conn = psycopg2.connect(host=app.config['HOSTDATABASE'], user=app.config['USERNAME'],
+                            password=app.config['PASSWORD'], dbname=app.config['DBNAME'])
+    cursor = conn.cursor()
+    cursor.execute(sqlstr, (request.form['lgn'],))
+    res = cursor.fetchall()
+    if len(res) == 1:
+        smtpObj = smtplib.SMTP('smtp.gmail.com', 587)
+#        smtpObj = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+        smtpObj.ehlo()
+        smtpObj.starttls()
+        smtpObj.ehlo()
+        smtpObj.login('elcon66.adm@gmail.com', 'tom321jerry')
+        msg = ["From: elcon66.adm@gmail.com",
+               "To: anch1@mail.ru",
+                "Subject: tema"]
+        msg = "\r\n".join(msg)
+#        msg=msg+"\r\n это собсно сам текст письма"
+        smtpObj.sendmail("elcon66.adm@gmail.com", "anch1@mail.ru", msg+MIMEText("\r\n Это дурацкое письмо ", 'plain', 'utf-8').as_string())
+        smtpObj.quit()
+
+
+    return render_template('message.html', ver=app.version, message='Пароль отправлен на email указанный для логина', urlret='/')
 
 @app.route('/logout/')
 def logout():
@@ -226,6 +255,7 @@ def logout():
     session['add_info'] = ""
     session['lgn'] = ""
     session['pwd'] = ""
+    session['country'] = ""
     app.enter_enabled = True
     refresh_menu()
     return render_template('logout.html', ver=app.version, name_out=no)
@@ -241,7 +271,7 @@ def userlist(nompage):
 
     session['userlist_nompage'] = nompage
     #                    0          1       2        3       4        5       6                 7                 8                       9       10
-    sqlstr = "select id_member, m.name, surname, famely, birsday, email, phone, comp.name compname, pos.name posname, acdegr.name  acdegrname, coalesce(addres,' ') " + \
+    sqlstr = "select id_member, m.name, surname, famely, birsday, email, phone, comp.name compname, pos.name posname, acdegr.name  acdegrname, coalesce(addres,' '), block " + \
              "from members m left outer join dict comp on (comp.dict_name='орг' and comp.id_dict=m.id_company) " + \
              "left outer join dict pos on (pos.dict_name='долж' and pos.id_dict=m.id_position) " + \
              "left outer join dict acpos on (pos.dict_name='учдолж' and pos.id_dict=m.id_acposition) " + \
@@ -338,11 +368,11 @@ def zlist(nompage):
 
 @app.route('/add_application/', methods=['GET', 'POST'])
 def addapplication():
-    return edit_application(-1)
+    return edit_application(-1, 1)
 
 
-@app.route('/edit_z/<int:id_application>', methods=['GET', 'POST'])
-def edit_application(id_application):
+@app.route('/edit_z/<int:id_application>/<int:nompage_sect>', methods=['GET', 'POST'])
+def edit_application(id_application, nompage_sect):
     au = session.get('is_auth', False)
     if not au:
         return redirect("/login/")
@@ -353,7 +383,7 @@ def edit_application(id_application):
             conn = psycopg2.connect(host=app.config['HOSTDATABASE'], user=app.config['USERNAME'],
                                     password=app.config['PASSWORD'], dbname=app.config['DBNAME'])
             cursor = conn.cursor()
-            if session['app_id_application'] == '-1':
+            if id_application == '-1':
                 cursor.execute(
                     "INSERT INTO application(theme, id_company, id_sciency,     datefrom,                   dateto,              dateatticle,                 datedecision,                  id_member, deleted,describe_conf, orgcom_conf, statusapplication, id_moderator) " \
                     "VALUES (                 %s,       %s,        %s,              %s,                        %s,                   %s,                          %s,                           %s,       'Н',     %s,              %s,             %s,           %s ) returning id_application;",
@@ -371,9 +401,10 @@ def edit_application(id_application):
 
                 conn.commit()
                 res = cursor.fetchall()
+                id_application=res[0][0]
             else:
-                sqlstr = "update application set theme = %s, id_company = %s, id_sciency = %s, datefrom = %s, dateto = %s, dateatticle = %s, datedecision = %s, id_member = %s, describe_conf = %s,orgcom_conf = %s , statusapplication = %s , id_moderator = %s " \
-                         "where id_application = " + str(session['app_id_application'])
+                sqlstr = " update application set theme = %s, id_company = %s, id_sciency = %s, datefrom = %s, dateto = %s, dateatticle = %s, datedecision = %s, id_member = %s, describe_conf = %s,orgcom_conf = %s , statusapplication = %s , id_moderator = %s " \
+                         " where id_application = " + str(id_application)
                 cursor.execute(sqlstr,
                                (
                                    request.form['theme'], request.form['comp_app'], request.form['type_sc'],
@@ -416,18 +447,26 @@ def edit_application(id_application):
         #
         session['app_statapps'] = [[0, 'на рассмотрении'], [1, 'одобрена'], [2, 'отказано']]
         #
+        applic = dict()
 
         if id_application == -1:
-            session['app_id_application'] = '-1'
-            session['app_theme'] = ''
-            session['app_id_company'] = session['comp_nm']
-            session['app_company'] = session['comp_nm']
-            session['app_id_member'] = session['id_member']
-            session['app_username'] = session['fml'] + ' ' + session['nm'] + ' ' + session['sn']
-            session['app_statapp'] = 0
-            session['app_id_mod'] = session['id_member']
-            session['app_disabled'] = ''
+            id_application = '-1'
+            applic['app_theme'] = ''
+            applic['app_id_company'] = session['comp_nm']
+            applic['app_company'] = session['comp_nm']
+            applic['app_id_member'] = session['id_member']
+            applic['app_username'] = session['fml'] + ' ' + session['nm'] + ' ' + session['sn']
+            applic['app_statapp'] = 0
+            applic['app_id_mod'] = session['id_member']
+            applic['app_date_from'] = date.today()
+            applic['app_date_to'] = date.today()
+            applic['app_dline_issue'] = date.today()
+            applic['app_dline_decision'] = date.today()
+            applic['app_descr_konf'] = ''
+            applic['app_orgcom'] = ''
 
+            applic['app_disabled'] = ''
+            applic['app_id_mod'] = session['id_member']
         else:
             #                  0               1       2            3          4        5             6            7            8             9               10            11          12                    13
             sqlstr = "select id_application, theme, id_company, id_sciency, datefrom, dateto, statusapplication, id_member, dateatticle, datedecision, describe_conf, orgcom_conf, statusapplication , id_moderator " + \
@@ -439,36 +478,62 @@ def edit_application(id_application):
                 return redirect("/error/")
 
             res_app = cursor.fetchall()
+            applic['app_theme'] = res_app[0][1]
+            applic['app_id_company'] = res_app[0][2]
+            applic['app_id_member'] = res_app[0][7]
+            applic['app_type_sc'] = res_app[0][3]
+            applic['app_date_from'] = res_app[0][4]
+            applic['app_date_to'] = res_app[0][5]
 
-            session['errorstr'] = ""
-            session['app_id_application'] = id_application
-            session['app_theme'] = res_app[0][1]
-            session['app_id_company'] = res_app[0][2]
-            session['app_id_member'] = res_app[0][7]
-            session['app_type_sc'] = res_app[0][3]
-            session['app_date_from'] = res_app[0][4]
-            session['app_date_to'] = res_app[0][5]
+            applic['app_dline_issue'] = res_app[0][8]
+            applic['app_dline_decision'] = res_app[0][9]
 
-            session['app_dline_issue'] = res_app[0][8]
-            session['app_dline_decision'] = res_app[0][9]
-
-            session['app_descr_konf'] = res_app[0][10]
-            session['app_orgcom'] = res_app[0][11]
-            session['app_statapp'] = res_app[0][12]
-            session['app_id_mod'] = res_app[0][13]
+            applic['app_descr_konf'] = res_app[0][10]
+            applic['app_orgcom'] = res_app[0][11]
+            applic['app_statapp'] = res_app[0][12]
+            applic['app_id_mod'] = res_app[0][13]
 
             if session['app_statapp'] >= 1:
                 session['app_disabled'] = 'disabled'
             else:
                 session['app_disabled'] = ''
 
+#****************
+
+        cursor.execute(
+            "select count(*) from section  where  id_application=" + str(id_application))
+        amountrec = cursor.fetchall()[0][0]
+
+        maxpage = (amountrec // app.lenthuserlistpage) + 1
+        pages = dict()
+        pages['sectlist_nompage'] = nompage_sect
+        pages['sectlist_minpage'] = nompage_sect - 5
+        if pages['sectlist_minpage'] < 1:
+            pages['sectlist_minpage'] = 1
+
+        pages['sectlist_maxpage'] = nompage_sect + 5
+        if pages['sectlist_maxpage'] > maxpage:
+            pages['sectlist_maxpage'] = maxpage
+
+        pages['nmsectpages'] = []
+        maxsectpages = pages['sectlist_maxpage']
+        for i in range(pages['sectlist_minpage'], pages['sectlist_maxpage'] + 1):
+            pages['nmsectpages'].append(i)
+# создаем список секций и сохраняем в сессии
+
+
         conn.close()
-        return render_template('add_application.html', ver=app.version)
+        return render_template('add_application.html', ver=app.version, id_application=id_application, pages=pages, applic=applic)
 
 
 @app.route('/edit_profil/')
 def edit_profil():
-    return render_template('Registry.html', ver=app.version, regim='edit')
+    conn = psycopg2.connect(host=app.config['HOSTDATABASE'], user=app.config['USERNAME'],
+                            password=app.config['PASSWORD'], dbname=app.config['DBNAME'])
+    cursor = conn.cursor()
+    makecombolists(cursor)
+    conn.close()
+    return render_template('Registry.html', ver=app.version, regim='edit', countrylst = countrylst)
 
 
 @app.route('/edit_profil/', methods=['POST'])
@@ -524,9 +589,10 @@ def conflist(nompage: int):
              "from application a left outer join dict comp on (comp.dict_name='орг' and comp.id_dict=a.id_company) " + \
              "left outer join dict sc on (sc.dict_name='онаук' and sc.id_dict=a.id_sciency), members m " + \
              "where (a.deleted<>'Д' or a.deleted is null) and m.id_member=a.id_member and statusapplication in (1,3,4,5,6) " + \
-             "and m.id_member =" + str(session['id_member']) + \
              "order by datefrom, theme limit " + \
              str(app.lenthuserlistpage) + " offset " + str((session['cflist_nompage'] - 1) * app.lenthuserlistpage)
+
+#             "and m.id_member =" + str(session['id_member']) + \
 
     conn = psycopg2.connect(host=app.config['HOSTDATABASE'], user=app.config['USERNAME'],
                             password=app.config['PASSWORD'], dbname=app.config['DBNAME'])
@@ -536,7 +602,7 @@ def conflist(nompage: int):
 
     session.cflist = cursor.fetchall()
 
-    cursor.execute("select count(*) from application where (deleted<>'Д' or deleted is null)")
+    cursor.execute("select count(*) from application where (deleted<>'Д' or deleted is null) and statusapplication in (1,3,4,5,6)")
     amountrec = cursor.fetchall()[0][0]
 
     maxpage = (amountrec // app.lenthuserlistpage) + 1
@@ -563,10 +629,10 @@ def listissue(nompage, id_app):
     session['islist_nompage'] = nompage
 
     # ***********************
-    #                       0             1        2                3                 4       5          6                              7                             8
+    #                       0    1        2                3                                             4                 5          6                                          7                8
 #    idconf = session.get('id_application', -1)
     idconf = id_app
-    session['id_application']=id_app
+    session['id_application'] = id_app
     sqlstr = "select id_issue, i.name, i.author, to_char(i.date_create, 'dd.mm.yyyy'), to_char(i.date_load, 'dd.mm.yyyy'), udk, m.name||' '||m.surname||' '||m.famely loader, i.statusissue " + \
              " from issue i, members m " + \
              " where (i.deleted<>'Д' or i.deleted is null) and m.id_member=i.id_member_ldr and id_application=" + str(idconf) + \
@@ -634,7 +700,7 @@ def editissueget(idissue: int):
 
     if idissue != -1:
         # Считываем и готовим данные публикации
-        #                    0       1     2                3            4    5      6       7            8         9          10             11         12        13             14
+        #                    0       1     2                3            4    5      6       7            8         9          10             11         12        13             14       15
         sqlstr = "select id_issue, name, annotation_r, annotation_e, tags_r,tags_e, udk, date_create, date_load, author, id_member_ldr,  statusissue, deleted, id_application, filename from issue where id_issue=%s"
         cursor.execute(sqlstr,(str(idissue),))
         res = cursor.fetchall()
@@ -654,7 +720,7 @@ def editissueget(idissue: int):
 
     if is_filename is None:
         is_filename = ""
-    return render_template( 'editissue.html', ver=app.version,     is_name = is_name, is_ann_rus = is_ann_rus, is_ann_eng = is_ann_eng, is_tags_rus = is_tags_rus, is_tags_eng = is_tags_eng, is_date_create = is_date_create, is_date_load = is_date_load, is_authors = is_authors, is_id_memeber = is_id_memeber, is_filename = is_filename, is_udk=is_udk )
+    return render_template('editissue.html', ver=app.version,     is_name = is_name, is_ann_rus = is_ann_rus, is_ann_eng = is_ann_eng, is_tags_rus = is_tags_rus, is_tags_eng = is_tags_eng, is_date_create = is_date_create, is_date_load = is_date_load, is_authors = is_authors, is_id_memeber = is_id_memeber, is_filename = is_filename, is_udk=is_udk )
 
 
 @app.route('/editissue/<int:idissue>',methods=['POST'])
@@ -669,7 +735,7 @@ def editissuepost(idissue: int):
 
 
         sqlstr = "insert into issue (name, udk,annotation_r, annotation_e, tags_r,tags_e,date_create ,date_load,author, id_member_ldr, statusissue, deleted, id_application ) " +\
-               "           values (%s,   ,  %s,   %s,          %s,          %s,    %s,       %s,             %s,    %s,         %s,          %s,         %s,        %s) returning id_issue"
+               "           values (%s,     %s,   %s,          %s,          %s,    %s,       %s,             %s,    %s,         %s,          %s,         %s,        %s) returning id_issue"
         cursor.execute(sqlstr, (request.form['name_issue'], request.form['is_udk'], request.form['is_ann_rus'], request.form['is_ann_eng'], request.form['is_tags_rus'], request.form['is_tags_eng'], request.form['date_create'],request.form['date_load'], request.form['is_authors'],  session['id_member'], '0', 'Н', session['id_application']))
         conn.commit()
         idissue = cursor.fetchall()[0][0]
@@ -696,9 +762,6 @@ def editissuepost(idissue: int):
 
     conn.close()
 
-
-
-
     return listissue(1, idconf)
 
 
@@ -721,22 +784,22 @@ def getInnerFilename(idis):
 # **********************************
 
 
-@app.route('/edit_user/<int:id_member>', methods=['GET'])
-def EditUserGet(id_member):
+@app.route('/edit_user/<int:nompage>/<int:id_member>', methods=['GET'])
+def EditUserGet(nompage,id_member):
     conn = psycopg2.connect(host=app.config['HOSTDATABASE'], user=app.config['USERNAME'],
                             password=app.config['PASSWORD'], dbname=app.config['DBNAME'])
     cursor = conn.cursor()
-    #               0        1      2        3       4       5      6     7       8         9         10              11            12          13        14
+    #               0        1      2        3       4       5      6     7       8         9         10              11            12          13        14     15     16
     cursor.execute(
-        "select id_member, name, surname, famely, birsday, email, sex, phone, add_info, id_company, id_acdegree, id_position, id_acposition, addres, userright, block from members where id_member=%s ",
+        "select id_member, name, surname, famely, birsday, email, sex, phone, add_info, id_company, id_acdegree, id_position, id_acposition, addres, userright, block, login from members where id_member=%s ",
         (str(id_member)))
     res = cursor.fetchall()
-    u_id_member=id_member
+    u_id_member = id_member
     u_nm = res[0][1]
     u_sn = res[0][2]
     u_fml = res[0][3]
     u_adr = res[0][13]
-    u_id_comp= res[0][9]
+    u_id_comp = res[0][9]
     u_id_uzv = res[0][10]
     u_em = res[0][5]
     u_id_dlgn = res[0][11]
@@ -744,27 +807,48 @@ def EditUserGet(id_member):
     u_sex = res[0][6]
     u_ph = res[0][7]
     u_add_info = res[0][8]
+    u_block = res[0][15]
+    u_lgn = res[0][16]
 
-    cursor.execute("select id_dict,name from dict where dict_name='орг' order by name")
-    session['res_org'] = cursor.fetchall()
-
-    cursor.execute("select id_dict,name from dict where dict_name='долж' order by name")
-    session['dolgns'] = cursor.fetchall()
-
-    cursor.execute("select id_dict,name from dict where dict_name='учзв' order by name")
-    session['uzvs'] = cursor.fetchall()
+    makecombolists(cursor)
 
     conn.close()
-    return render_template('EditUser.html', ver=app.version,  u_id_member=u_id_member, u_nm=u_nm, u_sn=u_sn, u_fml=u_fml, u_adr=u_adr, u_id_comp=u_id_comp, u_id_uzv=u_id_uzv, u_em=u_em, u_id_dlgn=u_id_dlgn, u_bd=u_bd, u_sex=u_sex, u_ph=u_ph, u_add_info=u_add_info)
+    for key in list(session.keys()):
+        print(key)
+    return render_template('EditUser.html', ver=app.version,  u_id_member=u_id_member, u_nm=u_nm, u_sn=u_sn, u_fml=u_fml, u_adr=u_adr, u_id_comp=u_id_comp, u_id_uzv=u_id_uzv, u_em=u_em, u_id_dlgn=u_id_dlgn, u_bd=u_bd, u_sex=u_sex, u_ph=u_ph,
+                           u_add_info=u_add_info, u_block=u_block, u_lgn=u_lgn ,countrylst=countrylst)
 
 
-
-@app.route('/edit_user/<int:id_member>', methods=['Post'])
-def EditUserPost(id_member):
-# имеем делотолько с сущетвующими пользователями
+@app.route('/edit_user/<int:nompage>/<int:id_member>', methods=['POST'])
+def EditUserPost(nompage, id_member):
     conn = psycopg2.connect(host=app.config['HOSTDATABASE'], user=app.config['USERNAME'],
                             password=app.config['PASSWORD'], dbname=app.config['DBNAME'])
     cursor = conn.cursor()
+    #                                0        1               2        3            4            5                6                   7                8                    9         10                11                      12          13            14
+    if request.form['blk']!='Б':
+        request.form['blk']=' '
+    cursor.execute(
+        "update members set  name = %s, surname = %s, famely = %s, birsday = %s, email = %s, sex = %s,        phone = %s,        add_info = %s, id_company = %s,  id_acdegree = %s, id_position = %s, addres = %s, block  = %s where id_member=%s ",
+        (      request.form['nm'], request.form['sn'], request.form['fml'], request.form['bd'], request.form['em'], request.form['sex'], request.form['ph'],
+               request.form['u_add_info'], request.form['comp_nm'], request.form['uzv'], request.form['dlgn'], request.form['adr'],   request.form['blk'], str(id_member)))
+    conn.commit()
+    conn.close()
+    return  userlist(nompage)
+
+def makecombolists(cursr):
+    cursr.execute("select id_dict,name from dict where dict_name='орг' order by name")
+    session['res_org'] = cursr.fetchall()
+
+    cursr.execute("select id_dict,name from dict where dict_name='долж' order by name")
+    session['dolgns'] = cursr.fetchall()
+
+    cursr.execute("select id_dict,name from dict where dict_name='учзв' order by name")
+    session['uzvs'] = cursr.fetchall()
+
+    cursr.execute("select id_country,name from country  order by name ")
+    global countrylst
+    countrylst = cursr.fetchall()
+    return 0
 
 
 

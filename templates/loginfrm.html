@@ -1,9 +1,10 @@
 {% extends "BasePage.html" %}
 {% block content %}
-    <div>
+    <div class="prcnt30">
+    &nbsp
+    </div>
+    <div class="prcnt30" >
         <form action="" method="post" class="login">
-
-
             <table id = "logtable" align="center">
                 {% if session['is_auth']==False  %}
                     <caption>{{ session.errorlogon }}</caption>
@@ -11,20 +12,24 @@
                     <caption>Вход на сайт</caption>
                 {% endif %}
                 <tr>
+                    <td></td>
                     <td>
                         <label for="lgn">Логин</label>
+                    </td>
                     <td>
                         <input value="{{ session.login }}" autofocus required tabindex="1" id="lgn" type="text" name="lgn" size="15" placeholder="Строка для входа на сайт" title="Строка для входа на сайт">
                     </td>
-
-
+                    <td></td>
                 </tr>
                 <tr>
+                    <td></td>
                     <td>
                         <label for="pwd">Пароль</label>
+                    </td>
                     <td>
                         <input required tabindex="2" id="pwd" type="password" name="pwd" size="15" title="Введите пароль">
                     </td>
+                    <td></td>
 
                 </tr>
                 <tr>
@@ -34,6 +39,9 @@
 
                     <td align="center">
                          <input type="button" tabindex="4" value="Отмена" name="break_enter" onclick="location.href='/' ">
+                    </td>
+                    <td align="center">
+                         <input type="button" tabindex="5" value="Восстановить пароль" name="recallpwd" onclick="location.href='/recallpwdfrm/' ">
                     </td>
                     <td align="center">
                          <input type="button" tabindex="5" value="Регистрация" name="registr" onclick="location.href='/registration/' ">
@@ -47,5 +55,8 @@
 
 
         </form>
+    </div>
+    &nbsp
+    <div class="prcnt30a">
     </div>
 {% endblock %}

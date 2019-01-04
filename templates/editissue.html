@@ -131,7 +131,7 @@
                                 {% if (is_filename!="")  %}
 
                                     <p><b>Материал публикации</b></p>
-                                     <embed src="{{ url_for('static', filename=is_filename) }}" width="100%" height="1200px" />
+                                     <embed src="{{ url_for('static', filename='upload/'+is_filename) }}" width="100%" height="1200px" />
                                 {%  endif %}
 
                             </td>

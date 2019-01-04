@@ -46,28 +46,27 @@
     <form id="auth" action="" method="post" onsubmit="return validateForm()" class="auth">
 <!--          <center>
             <fieldset class ="fst" >
--->            <input hidden value="{{ session.id_member }}" id="id_member" type="text" name="id_member">
+-->            <input hidden value="{{ u_id_member }}" id="id_member" type="text" name="id_member">
 
                     <table id = "regtable">
-                        {% if regim|string()=='edit'|string() %}
-                            <caption>Изменение данных профиля</caption>
-                        {% else %}
-                                <caption>Регистрация пользователя <br/>{{ session.errorstr }} </caption>
-                        {% endif %}
+                        <caption>Изменение данных пользователя</caption>
 
                             <tr>
+
                                 <td>
                                     <label for="lgn">Логин</label>
                                 </td>
                                 <td>
-                                    <input class="inpreg" value="{{ session.lgn }}" autofocus required tabindex="1" id="lgn" type="text" name="lgn"  placeholder="Строка для входа на сайт" title="Строка для входа на сайт">
+                                    <input class="inpreg" value="{{ u_lgn }}" autofocus required tabindex="1" id="lgn" type="text" name="lgn"  placeholder="Строка для входа на сайт" title="Строка для входа на сайт">
                                 </td>
+
+
 
                                 <td>
                                     <label for="bd">Дата рождения</label>
                                 </td>
                                 <td>
-                                    <input class="inpbd" value="{{ session.bd }}" required tabindex="8" id="bd" type="date" name="bd"><br/>
+                                    <input class="inpbd" value="{{ u_bd }}" required tabindex="8" id="bd" type="date" name="bd"><br/>
                                 </td>
 
 
@@ -75,10 +74,24 @@
                             </tr>
                             <tr>
                                 <td>
-                                    <label for="pwd">Пароль</label>
+                                    <label for="blk">Заблокировать/разблокировать </label>
                                 </td>
                                 <td>
-                                    <input required class="inpreg" tabindex="2" id="pwd" type="password" name="pwd" placeholder="Не менее 6 символов" title="Не менее 6 символов">
+
+                                    <select class = "selreg" size="1" tabindex="8" name="blk" id="blk">
+                                        {% if u_block|string()=='Б' %}
+                                            <option value="Н">Не заблокирован</option>
+                                            <option selected value="Б">Заблокирован</option>
+                                        {% else %}
+                                            <option selected value="Н">Не заблокирован</option>
+                                            <option value="Б">Заблокирован</option>
+                                        {% endif %}
+                                    </select>
+
+
+
+
+
                                 </td>
 
                                 <td>
@@ -87,7 +100,7 @@
                                 <td>
                                     <select class = "selreg" size="1" tabindex="9" name="sex" id="sex">
                                         <option disabled>Пол</option>
-                                        {% if session['sex']=='М' %}
+                                        {% if u_sex=='М' %}
                                             <option selected value="М">Мужской</option>
                                             <option value="Ж">Женский</option>
                                         {% else %}
@@ -97,95 +110,6 @@
                                     </select>
                                 </td>
                             </tr>
-                            <tr>
-                                <td>
-                                    <label for="conf_pwd">Подтв. пароля</label>
-                                </td>
-                                <td>
-                                    <input required class="inpreg" tabindex="3" id="conf_pwd" type="password" name="conf_pwd"  placeholder="Должен совпадать с паролем" title="должен совпадать с паролем">
-                                </td>
-                                <td>
-                                    <label for="em">Эл.почта</label>
-                                </td>
-                                <td>
-                                    <input  class="inpreg" value="{{ session.em }}" required tabindex="10" id="em" type="email" name="em"  >
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <label for="fml">Фамилия</label>
-                                </td>
-                                <td>
-                                    <input class="inpreg" value="{{ session.fml }}" required tabindex="4" id="fml" type="text" name="fml"  >
-                                </td>
-                                <td>
-                                    <label for="ph">Телефон</label>
-                                </td>
-                                <td>
-                                    <input  class="inpreg" value="{{ session.ph  }}" title="Формат +X(XXX)XXX-XX-XX" required tabindex="11" id="ph" type="text" name="ph" pattern="\+{0,1}\d\([0-9]{3}\)[0-9]{3}-[0-9]{2}-[0-9]{2}"  placeholder="+7(XXX)XXX-XX-XX">
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <label for="nm">Имя</label>
-                                </td>
-                                <td>
-                                    <input class="inpreg" value ="{{ session.nm }}" required tabindex="5" id="nm" type="text" name="nm"  >
-                                </td>
-
-                                <td>
-                                    <label for="comp_nm">Организация</label>
-                                </td>
-                                <td>
-                                    <select class = "selreg" tabindex="12" id="comp_nm" name="comp_nm" size="1" >
-                                        {% if session.comp_nm==-1 %}
-                                            <option selected value=-1>не указано</option>
-                                        {% else %}
-                                            <option  value=-1>не указано</option>
-                                        {% endif %}
-
-                                        {% for comp in session.res_org %}
-                                            {% if comp[0]|string()==session.comp_nm|string() %}
-                                                <option selected value={{ comp[0] }}>{{ comp[1] }}</option>
-                                            {% else %}
-                                                <option value={{ comp[0] }}>{{ comp[1] }} </option>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <label for="sn">Отчество</label>
-                                </td>
-                                <td>
-                                    <input class="inpreg" value="{{ session.sn }}"required tabindex="6" id="sn" type="text" name="sn" >
-                                </td>
-                                <td>
-                                    <label for="dlgn">Должность </label>
-                                </td>
-                                <td>
-                                    <select class = "selreg" id="dlgn" tabindex="13" name="dlgn" >
-                                       {% if session.dlgn=="-1" %}
-                                            <option selected value=-1>не указано</option>
-                                        {% else %}
-                                            <option value=-1>не указано</option>
-                                        {% endif %}
-                                        {% for dolgn in session.dolgns %}
-                                            {% if session.dlgn|string()==dolgn[0]|string() %}
-                                                <option selected value={{ dolgn[0] }}>{{ dolgn[1] }}</option>
-                                            {% else %}
-                                                <option value={{ dolgn[0] }}>{{ dolgn[1] }}</option>
-                                            {% endif %}
-
-                                        {% endfor %}
-
-                                    </select>
-                                </td>
-
-                            </tr>
-
-
                             <tr>
                                 <td>
                                     <label for="country">Страна</label>
@@ -209,27 +133,105 @@
 
                                     </select>
                                 </td>
+                                <td>
+                                    <label for="em">Эл.почта</label>
+                                </td>
+                                <td>
+                                    <input  class="inpreg" value="{{ u_em }}" required tabindex="10" id="em" type="email" name="em"  >
+                                </td>
                             </tr>
+                            <tr>
+                                <td>
+                                    <label for="fml">Фамилия</label>
+                                </td>
+                                <td>
+                                    <input class="inpreg" value="{{ u_fml }}" required tabindex="4" id="fml" type="text" name="fml"  >
+                                </td>
+                                <td>
+                                    <label for="ph">Телефон</label>
+                                </td>
+                                <td>
+                                    <input  class="inpreg" value="{{ u_ph  }}" title="Формат +X(XXX)XXX-XX-XX" required tabindex="11" id="ph" type="text" name="ph" pattern="\+{0,1}\d\([0-9]{3}\)[0-9]{3}-[0-9]{2}-[0-9]{2}"  placeholder="+7(XXX)XXX-XX-XX">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="nm">Имя</label>
+                                </td>
+                                <td>
+                                    <input class="inpreg" value ="{{ u_nm }}" required tabindex="5" id="nm" type="text" name="nm"  >
+                                </td>
 
+                                <td>
+                                    <label for="comp_nm">Организация</label>
+                                </td>
+                                <td>
+                                    <select class = "selreg" tabindex="12" id="comp_nm" name="comp_nm" size="1" >
+                                        {% if u_id_comp==-1 %}
+                                            <option selected value=-1>не указано</option>
+                                        {% else %}
+                                            <option  value=-1>не указано</option>
+                                        {% endif %}
+
+                                        {% for comp in session.res_org %}
+                                            {% if comp[0]|string()==u_id_comp|string() %}
+                                                <option selected value={{ comp[0] }}>{{ comp[1] }}</option>
+                                            {% else %}
+                                                <option value={{ comp[0] }}>{{ comp[1] }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="sn">Отчество</label>
+                                </td>
+                                <td>
+                                    <input class="inpreg" value="{{ u_sn }}"required tabindex="6" id="sn" type="text" name="sn" >
+                                </td>
+                                <td>
+                                    <label for="dlgn">Должность </label>
+                                </td>
+                                <td>
+                                    <select class = "selreg" id="dlgn" tabindex="13" name="dlgn" >
+                                       {% if u_id_dlgn=="-1" %}
+                                            <option selected value=-1>не указано</option>
+                                        {% else %}
+                                            <option value=-1>не указано</option>
+                                        {% endif %}
+                                        {% for dolgn in  session.dolgns %}
+                                            {% if u_id_dlgn|string()==dolgn[0]|string() %}
+                                                <option selected value={{ dolgn[0] }}>{{ dolgn[1] }}</option>
+                                            {% else %}
+                                                <option value={{ dolgn[0] }}>{{ dolgn[1] }}</option>
+                                            {% endif %}
+
+                                        {% endfor %}
+
+                                    </select>
+                                </td>
+
+                            </tr>
                             <tr>
                                 <td>
                                     <label for="adr">Проживание <br/> (нас.пункт)</label>
                                 </td>
                                 <td>
-                                    <input class="inpreg" value="{{ session.adr }}" required tabindex="7" id="adr" type="text" name="adr" >
+                                    <input class="inpreg" value="{{ u_adr }}" required tabindex="7" id="adr" type="text" name="adr" >
                                 </td>
                                 <td>
                                     <label for="uzv">Уч. звание</label>
                                 </td>
                                 <td>
                                     <select class = "selreg" tabindex="14" id="uzv"  name="uzv" size="1">
-                                        {% if session.uzv=="-1" %}
+                                        {% if u_id_uzv=="-1" %}
                                             <option selected value=-1>не указано</option>
                                         {% else %}
                                             <option value=-1>не указано</option>
                                         {% endif %}
                                         {% for uzv in session.uzvs %}
-                                            {% if session.uzv|string()==uzv[0]|string() %}
+                                            {% if u_id_uzv|string()==uzv[0]|string() %}
                                                 <option selected value={{ uzv[0] }}>{{ uzv[1] }}</option>
                                             {% else %}
                                                 <option value={{ uzv[0] }}>{{ uzv[1] }}</option>
@@ -242,32 +244,29 @@
                             </tr>
                             <tr class="rowcenter">
                                 <td colspan="4">
-                                    <label for="sn"><b>Доп.информация</b></label>
+                                    <b>Доп.информация</b></label>
                                 </td>
                             </tr>
                             <tr>
                                 <td colspan="4">
-                                    <textarea   tabindex="15" id="add_info" rows="3" name="add_info">
-                                        {{ session.add_info }}
+
+                                    <textarea   tabindex="15" id="u_add_info" rows="3" name="u_add_info">
+                                        {{ u_add_info }}
                                     </textarea>
                                     <script>
 
-                                        CKEDITOR.replace( 'add_info' );
+                                        CKEDITOR.replace( 'u_add_info' );
 
                                     </script>
                                 </td>
                             </tr>
                             <tr class="rowcenter">
                                 <td colspan="2" >
-                                     {% if regim|string()=='edit'|string() %}
-                                        <input type="submit" tabindex="16" value="Сохранить" name="sub">
-                                     {% else %}
-                                        <input type="submit" tabindex="16" value="Регистрация" name="sub">
-                                     {% endif %}
+                                    <input type="submit" tabindex="16" value="Сохранить" name="sub">
                                 </td>
 
                                 <td colspan="2" >
-                                     <input type="button" tabindex="17" value="Отмена" name="break" onclick="location.href='/' ">
+                                     <input type="button" tabindex="17" value="Отмена" name="break" onclick="location.href='javascript:history.go(-1)' ">
                                 </td>
 
                             </tr>

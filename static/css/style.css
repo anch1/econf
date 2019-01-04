@@ -70,8 +70,16 @@ body    {
     border: 1px solid black;
     border-radius: 5px;
         }
-
-
+.prcnt30{
+    width:32.5%;
+    float:left;
+    hight:5;
+}
+.prcnt30a{
+    width:auto;
+    float:left;
+    hight:5;
+}
 .content-box{
             margin-top:10px;
             margin-left:10px;
@@ -163,13 +171,43 @@ table caption{
 }
 /*Добавление заявки*/
 .rowcenter{text-align: center;}
-#date_from , #date_to, #dline_issue , #dline_decision{
+#date_create, #date_load, #date_from , #date_to, #dline_issue , #dline_decision{
     height: 1ex;
 
 }
 .headulist{
 
 }
+.inpapp{
+    width:calc(100% - 19px);
+}
+.selapp{
+    width:calc(100% - 0px);
+}
+.inpis{
+    width:calc(100% - 19px);
+}
+.sectionTable
+{
+    align: center;
+    width:100%;
+    border: 1px solid black;
+}
+
+tr:nth-child(odd) {
+    background: beige; /* Цвет фона */
+
+}
+
+TH {
+    text-align: left; /* Выравнивание по левому краю */
+    background: black; /* Цвет фона */
+    color: white; /* Цвет текста */
+   }
+tfoot td{
+    background-color: azure;
+}
+
 /*
 #theme{
     width:96%;
@@ -177,9 +215,6 @@ table caption{
 }
 #type_sc{
     width:100%;
-}
-.inpapp{
-    width:20ex;
 }
 .selapp{
     width:23ex;
