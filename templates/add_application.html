@@ -51,6 +51,32 @@
     }
     </script>
 
+    <script type="text/javascript">
+
+    function sendquery()
+    {
+        var dt = {namenewsect:"привет"};
+        $.get("/newsect",dt,handlenewsect,"json");
+    }
+    function handlenewsect(reqdate)
+    {
+        alert("Пришло "+reqdate.name)
+    }
+    window.onload = function() {
+        $('#modalsave').click(sendquery);
+
+        $(document).on('keydown', function(e) {
+        // ESCAPE key pressed
+            if (e.keyCode == 27) {
+                history.go(-1);
+            }
+        });
+
+
+    }
+
+    </script>
+
     <script src={{url_for('static', filename='ckeditor/ckeditor.js') }}></script>
 
     <div>
@@ -130,7 +156,7 @@
                         <tr>
                             <td colspan="4" >
                                 <table class="sectionTable" >
-                                        <caption>Секции конференции<br/>   <a href="/add_section/" >Добавить секцию</a> </caption>
+                                        <caption>Секции конференции<br/>   <a href="#modal" >Добавить секцию</a> </caption>
                                         <tr>
                                             <th>
                                                 Наименование секции
@@ -169,17 +195,24 @@
                                                 </td>
                                             </tr>
                                         </tfoot>
+
+
+                                    {% for s in session.sections %}
                                         <tr>
                                             <td>
-                                               1244cc4c4 c5
+                                                <a href='/edit_sec/{{ s[0]}}/1'>{{ s[1] }}</a> <!-- название -->
                                             </td>
                                             <td>
-                                                 14343 141t
+                                                <a href='/edit_sec/{{ s[0]}}/1'>{{ s[2] }}</a>   <!-- модератор -->
                                             </td>
+
                                             <td>
-                                                1 t43 c5t 5t5t
+                                                <a href='/deletesec/{{ s[0]}}' onclick='return accept_onclick()'>Удалить</a>
                                             </td>
+
                                         </tr>
+
+                                    {% endfor %}
 
                                 </table>
                             </td>
@@ -317,7 +350,7 @@
                         </tr>
                             <tr class="rowcenter">
                                 <td colspan="2" >
-                                    <input type="submit" tabindex="13" value="Сохранить" name="subapp" {{ session.app_disabled }}>
+                                    <input type="submit" tabindex="13" value="Сохранить" id = "subapp" name="subapp" {{ session.app_disabled }}>
                                 </td>
 
                                 <td colspan="2" >
@@ -334,13 +367,32 @@
             </fieldset>
 <!--         </center>
 -->
-        </form>
-     <script>
+
+
+    </form>
+    <script>
 
          CKEDITOR.replace( 'descr_konf' );
          CKEDITOR.replace( 'orgcom' );
 
-     </script>
+    </script>
 
+    </div>
+    <div class="modal" id="modal">
+        <div class="modal-dialog" >
+            <div class="headmodal">
+                <h> Новая секция </h>
+            </div>
+            <div class="bodymodal">
+                <label for="inpnmsection">Наименование секции</label>
+                <input class="inpnmsection" value="" required tabindex="100" id="inpnmsection" type="text" name="inpnmsection" >
+            </div>
+            <div class="footermodal">
+                <input type="button" tabindex="110" value="Сохранить" name="modalsave" id="modalsave" onclick="location.href='#' ">
+                <input type="button" tabindex="111" value="Отмена" name="modalbreak" onclick="location.href='#' ">
+<!--                <a href="#" class="btn">Закрыть</a>
+-->
+            </div>
+        </div>
     </div>
 {% endblock %}

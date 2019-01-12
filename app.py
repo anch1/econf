@@ -3,7 +3,7 @@ from typing import Any, Union
 from datetime import datetime, date, time
 import psycopg2
 import smtplib
-from flask import Flask, request, render_template, session, redirect, Markup, url_for
+from flask import Flask, request, render_template, session, redirect, Markup, url_for,jsonify
 from werkzeug.utils import secure_filename
 from email.mime.text import MIMEText
 app = Flask(__name__)
@@ -404,11 +404,7 @@ def edit_application(id_application, nompage_sect):
                 id_application=res[0][0]
             else:
                 sqlstr = " update application set theme = %s, id_company = %s, id_sciency = %s, datefrom = %s, dateto = %s, dateatticle = %s, datedecision = %s, id_member = %s, describe_conf = %s,orgcom_conf = %s , statusapplication = %s , id_moderator = %s " \
-<<<<<<< HEAD
                          " where id_application = " + str(id_application)
-=======
-                         " where id_application = " + str(session['app_id_application'])
->>>>>>> fa1e0914603322e12db9459791c92140194d73a8
                 cursor.execute(sqlstr,
                                (
                                    request.form['theme'], request.form['comp_app'], request.form['type_sc'],
@@ -469,7 +465,7 @@ def edit_application(id_application, nompage_sect):
             applic['app_descr_konf'] = ''
             applic['app_orgcom'] = ''
 
-            applic['app_disabled'] = ''
+            session['app_disabled'] = ''
             applic['app_id_mod'] = session['id_member']
         else:
             #                  0               1       2            3          4        5             6            7            8             9               10            11          12                    13
@@ -497,7 +493,7 @@ def edit_application(id_application, nompage_sect):
             applic['app_statapp'] = res_app[0][12]
             applic['app_id_mod'] = res_app[0][13]
 
-            if session['app_statapp'] >= 1:
+            if applic['app_statapp'] >= 1:
                 session['app_disabled'] = 'disabled'
             else:
                 session['app_disabled'] = ''
@@ -524,8 +520,10 @@ def edit_application(id_application, nompage_sect):
         for i in range(pages['sectlist_minpage'], pages['sectlist_maxpage'] + 1):
             pages['nmsectpages'].append(i)
 # создаем список секций и сохраняем в сессии
+        cursor.execute(
+            "select id_section, namesection, id_member from section  where  id_application=" + str(id_application))
 
-
+        session['sections'] = cursor.fetchall()
         conn.close()
         return render_template('add_application.html', ver=app.version, id_application=id_application, pages=pages, applic=applic)
 
@@ -720,30 +718,17 @@ def editissueget(idissue: int):
         is_id_memeber = res[0][10]
         is_filename = res[0][14]
         conn.close()
-<<<<<<< HEAD
-=======
 
->>>>>>> fa1e0914603322e12db9459791c92140194d73a8
 
     if is_filename is None:
         is_filename = ""
     return render_template('editissue.html', ver=app.version,     is_name = is_name, is_ann_rus = is_ann_rus, is_ann_eng = is_ann_eng, is_tags_rus = is_tags_rus, is_tags_eng = is_tags_eng, is_date_create = is_date_create, is_date_load = is_date_load, is_authors = is_authors, is_id_memeber = is_id_memeber, is_filename = is_filename, is_udk=is_udk )
 
-    if is_filename is None:
-        is_filename = ""
-    return render_template('editissue.html', ver=app.version,     is_name = is_name, is_ann_rus = is_ann_rus, is_ann_eng = is_ann_eng, is_tags_rus = is_tags_rus, is_tags_eng = is_tags_eng, is_date_create = is_date_create, is_date_load = is_date_load, is_authors = is_authors, is_id_memeber = is_id_memeber, is_filename = is_filename, is_udk=is_udk )
 
 @app.route('/editissue/<int:idissue>',methods=['POST'])
 def editissuepost(idissue: int):
     idconf = session.get('id_application', -1)
 
-<<<<<<< HEAD
-@app.route('/editissue/<int:idissue>',methods=['POST'])
-def editissuepost(idissue: int):
-    idconf = session.get('id_application', -1)
-
-=======
->>>>>>> fa1e0914603322e12db9459791c92140194d73a8
     conn = psycopg2.connect(host=app.config['HOSTDATABASE'], user=app.config['USERNAME'],
                             password=app.config['PASSWORD'], dbname=app.config['DBNAME'])
     cursor = conn.cursor()
@@ -752,11 +737,7 @@ def editissuepost(idissue: int):
 
 
         sqlstr = "insert into issue (name, udk,annotation_r, annotation_e, tags_r,tags_e,date_create ,date_load,author, id_member_ldr, statusissue, deleted, id_application ) " +\
-<<<<<<< HEAD
                "           values (%s,     %s,   %s,          %s,          %s,    %s,       %s,             %s,    %s,         %s,          %s,         %s,        %s) returning id_issue"
-=======
-               "           values (%s,   ,  %s,   %s,          %s,          %s,    %s,       %s,             %s,    %s,         %s,          %s,         %s,        %s) returning id_issue"
->>>>>>> fa1e0914603322e12db9459791c92140194d73a8
         cursor.execute(sqlstr, (request.form['name_issue'], request.form['is_udk'], request.form['is_ann_rus'], request.form['is_ann_eng'], request.form['is_tags_rus'], request.form['is_tags_eng'], request.form['date_create'],request.form['date_load'], request.form['is_authors'],  session['id_member'], '0', 'Н', session['id_application']))
         conn.commit()
         idissue = cursor.fetchall()[0][0]
@@ -810,30 +791,17 @@ def EditUserGet(nompage,id_member):
     conn = psycopg2.connect(host=app.config['HOSTDATABASE'], user=app.config['USERNAME'],
                             password=app.config['PASSWORD'], dbname=app.config['DBNAME'])
     cursor = conn.cursor()
-<<<<<<< HEAD
     #               0        1      2        3       4       5      6     7       8         9         10              11            12          13        14     15     16
     cursor.execute(
         "select id_member, name, surname, famely, birsday, email, sex, phone, add_info, id_company, id_acdegree, id_position, id_acposition, addres, userright, block, login from members where id_member=%s ",
         (str(id_member)))
     res = cursor.fetchall()
     u_id_member = id_member
-=======
-    #               0        1      2        3       4       5      6     7       8         9         10              11            12          13        14
-    cursor.execute(
-        "select id_member, name, surname, famely, birsday, email, sex, phone, add_info, id_company, id_acdegree, id_position, id_acposition, addres, userright, block from members where id_member=%s ",
-        (str(id_member)))
-    res = cursor.fetchall()
-    u_id_member= id_member
->>>>>>> fa1e0914603322e12db9459791c92140194d73a8
     u_nm = res[0][1]
     u_sn = res[0][2]
     u_fml = res[0][3]
     u_adr = res[0][13]
-<<<<<<< HEAD
     u_id_comp = res[0][9]
-=======
-    u_id_comp= res[0][9]
->>>>>>> fa1e0914603322e12db9459791c92140194d73a8
     u_id_uzv = res[0][10]
     u_em = res[0][5]
     u_id_dlgn = res[0][11]
@@ -842,10 +810,7 @@ def EditUserGet(nompage,id_member):
     u_ph = res[0][7]
     u_add_info = res[0][8]
     u_block = res[0][15]
-<<<<<<< HEAD
     u_lgn = res[0][16]
-=======
->>>>>>> fa1e0914603322e12db9459791c92140194d73a8
 
     makecombolists(cursor)
 
@@ -853,11 +818,7 @@ def EditUserGet(nompage,id_member):
     for key in list(session.keys()):
         print(key)
     return render_template('EditUser.html', ver=app.version,  u_id_member=u_id_member, u_nm=u_nm, u_sn=u_sn, u_fml=u_fml, u_adr=u_adr, u_id_comp=u_id_comp, u_id_uzv=u_id_uzv, u_em=u_em, u_id_dlgn=u_id_dlgn, u_bd=u_bd, u_sex=u_sex, u_ph=u_ph,
-<<<<<<< HEAD
                            u_add_info=u_add_info, u_block=u_block, u_lgn=u_lgn ,countrylst=countrylst)
-=======
-                           u_add_info=u_add_info, u_block=u_block, countrylst=countrylst)
->>>>>>> fa1e0914603322e12db9459791c92140194d73a8
 
 
 @app.route('/edit_user/<int:nompage>/<int:id_member>', methods=['POST'])
@@ -866,11 +827,8 @@ def EditUserPost(nompage, id_member):
                             password=app.config['PASSWORD'], dbname=app.config['DBNAME'])
     cursor = conn.cursor()
     #                                0        1               2        3            4            5                6                   7                8                    9         10                11                      12          13            14
-<<<<<<< HEAD
     if request.form['blk']!='Б':
         request.form['blk']=' '
-=======
->>>>>>> fa1e0914603322e12db9459791c92140194d73a8
     cursor.execute(
         "update members set  name = %s, surname = %s, famely = %s, birsday = %s, email = %s, sex = %s,        phone = %s,        add_info = %s, id_company = %s,  id_acdegree = %s, id_position = %s, addres = %s, block  = %s where id_member=%s ",
         (      request.form['nm'], request.form['sn'], request.form['fml'], request.form['bd'], request.form['em'], request.form['sex'], request.form['ph'],
@@ -896,8 +854,11 @@ def makecombolists(cursr):
 
 
 
-
-
+@app.route('/newsect/')
+def newsect():
+    d=dict()
+    d['name'] = 'наименование'
+    return jsonify(d)
 
 if __name__ == '__main__':
     app.run()

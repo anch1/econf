@@ -3,7 +3,7 @@
         <head>
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1">
-
+            <link rel="shortcut icon " type = "image/ico" href="{{url_for("static",filename="pic/favicon.ico")}}">
             {% if title %}
                 <title>{{ title }}</title>
             {% else %}
@@ -12,9 +12,8 @@
 
             <link rel="stylesheet" href="/static/css/style.css">
 
+             <script src={{url_for('static', filename='jquery-3.3.1.js') }}></script>
     <!-- Подключение библиотеки jQuery
-            <script src="./jquery.js"></script>
-    Подключение jQuery плагина Masked Input
             <script src="./jquery.maskedinput.min.js"></script>
     Inline scripts are forbidden in Firefox OS apps (CSP restrictions),
              so we use a script file.
