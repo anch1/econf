@@ -55,13 +55,25 @@
 
     function sendquery()
     {
-        var dt = {namenewsect:"привет"};
-        $.get("/newsect",dt,handlenewsect,"json");
+        var dt = {namenewsect : document.getElementById("inpnmsection").value, id_moder:document.getElementById("selModerNew").value, nompage:{{  pages.sectlist_nompage }}, id_application:{{id_application}} };
+        $.get("/newsect",dt,handlenewsect,"html");
     }
     function handlenewsect(reqdate)
     {
-        alert("Пришло "+reqdate.name)
+        alert("Пришло "+reqdate)
+        document.getElementById("sect_place").innerHTML=reqdate
     }
+
+    function delsect(idsect, nmsect)
+    {
+        if (confirm("Удалить секцию ?"+nmsect))
+        {
+            var dt = {idsect : idsect, nompage:{{  pages.sectlist_nompage }}, id_application:{{id_application}} };
+            $.get("/delsect",dt,handlenewsect,"html");
+        }
+
+    }
+
     window.onload = function() {
         $('#modalsave').click(sendquery);
 
@@ -154,67 +166,10 @@
 
                         </tr>
                         <tr>
-                            <td colspan="4" >
-                                <table class="sectionTable" >
-                                        <caption>Секции конференции<br/>   <a href="#modal" >Добавить секцию</a> </caption>
-                                        <tr>
-                                            <th>
-                                                Наименование секции
-                                            </th>
-                                            <th>
-                                                Модератор
-                                            </th>
-                                            <th>
-                                                Действия
-                                            </th>
+                            <td id="sect_place" colspan="4" >
 
-                                        </tr>
+                            {% include "EditNewSect.html" %}
 
-                                        <tfoot>
-                                            <tr>
-                                                <td colspan="3">
-                                                    <div class="pagerow">
-
-                                                        {% if (pages['sectlist_nompage']==1) %}
-                                                            <a class='nextprew' href='/listissue/1/{{id_application}}'>Пред</a>
-                                                        {% else %}
-                                                            <a class='nextprew' href='/listissue/{{ pages.sectlist_nompage-1 }}/{{id_application}}'>Пред</a>
-                                                        {% endif %}
-
-                                                        {% for pg in pages['nmsectpages'] %}
-                                                            {% if pg!=pages['sectlist_nompage'] %}
-                                                                <a class='page' href='/listissue/{{ pg}}/{{id_application}}'>{{ pg }}</a>
-                                                            {% else %}
-                                                                <a class="currentpage" href='/listissue/{{ pg}}/{{id_application}}'>{{ pg }}</a>
-                                                            {% endif %}
-
-                                                        {% endfor %}
-
-                                                        <a class='nextprew' href='/listissue/{%if pages.sectlist_nompage>=pages.sectlist_maxpage%}{{pages.sectlist_maxpage}}{% else %}{{ pages.sectlist_nompage+1}}{%endif%}/{{id_application}}'>След</a>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </tfoot>
-
-
-                                    {% for s in session.sections %}
-                                        <tr>
-                                            <td>
-                                                <a href='/edit_sec/{{ s[0]}}/1'>{{ s[1] }}</a> <!-- название -->
-                                            </td>
-                                            <td>
-                                                <a href='/edit_sec/{{ s[0]}}/1'>{{ s[2] }}</a>   <!-- модератор -->
-                                            </td>
-
-                                            <td>
-                                                <a href='/deletesec/{{ s[0]}}' onclick='return accept_onclick()'>Удалить</a>
-                                            </td>
-
-                                        </tr>
-
-                                    {% endfor %}
-
-                                </table>
                             </td>
                         </tr>
                         <tr>
@@ -384,8 +339,30 @@
                 <h> Новая секция </h>
             </div>
             <div class="bodymodal">
-                <label for="inpnmsection">Наименование секции</label>
-                <input class="inpnmsection" value="" required tabindex="100" id="inpnmsection" type="text" name="inpnmsection" >
+                <table id = "edNewAppSect">
+                    <tr>
+                        <td>
+                            <label for="inpnmsection">Наименование секции</label>
+                        </td>
+                        <td>
+                            <input class="ModNewsection" value="" required tabindex="100" id="inpnmsection" type="text" name="inpnmsection" >
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label for="moderator">Модератор</label>
+                        </td>
+                        <td>
+                            <select class="ModNewsection" tabindex="101" id="selModerNew" name="selModerNew" size="1" >
+                                <option selected value=-1>не указано</option>
+
+                                {% for tsc in session.app_members %}
+                                    <option value={{ tsc[0] }}>{{ tsc[1] }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+                </table>
             </div>
             <div class="footermodal">
                 <input type="button" tabindex="110" value="Сохранить" name="modalsave" id="modalsave" onclick="location.href='#' ">

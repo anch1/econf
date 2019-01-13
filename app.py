@@ -210,7 +210,7 @@ def recallpwd():
 
 @app.route('/recallpwdfrm/', methods=['post'])
 def recallpwdpost():
-    sqlstr = "select email,  from members where login = %s"
+    sqlstr = "select email from members where login = %s"
     conn = psycopg2.connect(host=app.config['HOSTDATABASE'], user=app.config['USERNAME'],
                             password=app.config['PASSWORD'], dbname=app.config['DBNAME'])
     cursor = conn.cursor()
@@ -403,7 +403,7 @@ def edit_application(id_application, nompage_sect):
                 res = cursor.fetchall()
                 id_application=res[0][0]
             else:
-                sqlstr = " update application set theme = %s, id_company = %s, id_sciency = %s, datefrom = %s, dateto = %s, dateatticle = %s, datedecision = %s, id_member = %s, describe_conf = %s,orgcom_conf = %s , statusapplication = %s , id_moderator = %s " \
+                sqlstr = " update application set theme = %s, id_company = %s, id_sciency = %s, datefrom = %s, dateto = %s, dateatticle = %s, datedecision = %s, id_member = %s, describe_conf = %s,orgcom_conf = %s , statusapplication = %s , id_moderator = %s " +\
                          " where id_application = " + str(id_application)
                 cursor.execute(sqlstr,
                                (
@@ -856,9 +856,96 @@ def makecombolists(cursr):
 
 @app.route('/newsect/')
 def newsect():
-    d=dict()
-    d['name'] = 'наименование'
-    return jsonify(d)
+#    dd =request.args.get('namenewsect', 'ФИГНЯ')
+#    d=dict()
+#    d['name'] = dd
+#    return jsonify(d)
+
+    id_application = request.args.get('id_application', -1,type=int)
+    nompage_sect = request.args.get('nompage', 1,type=int)
+    conn = psycopg2.connect(host=app.config['HOSTDATABASE'], user=app.config['USERNAME'],
+                            password=app.config['PASSWORD'], dbname=app.config['DBNAME'])
+    cursor = conn.cursor()
+
+
+    cursor.execute(
+        "insert into section (namesection, id_member, id_application) values (%s, %s , %s) returning id_section", (request.args.get('namenewsect', 'Нет наименования'), request.args.get('id_moder', '-1'), str(id_application),))
+    IdSect=cursor.fetchall()[0][0]
+
+
+    conn.commit()
+
+    cursor.execute(
+        "select count(*) from section  where  id_application=" + str(id_application))
+    amountrec = cursor.fetchall()[0][0]
+
+    maxpage = (amountrec // app.lenthuserlistpage) + 1
+    pages = dict()
+    pages['sectlist_nompage'] = nompage_sect
+    pages['sectlist_minpage'] = nompage_sect - 5
+    if pages['sectlist_minpage'] < 1:
+        pages['sectlist_minpage'] = 1
+
+    pages['sectlist_maxpage'] = nompage_sect + 5
+    if pages['sectlist_maxpage'] > maxpage:
+        pages['sectlist_maxpage'] = maxpage
+
+    pages['nmsectpages'] = []
+    maxsectpages = pages['sectlist_maxpage']
+    for i in range(pages['sectlist_minpage'], pages['sectlist_maxpage'] + 1):
+        pages['nmsectpages'].append(i)
+    # создаем список секций и сохраняем в сессии
+    cursor.execute(
+        "select id_section, namesection, id_member from section  where  id_application=" + str(id_application))
+
+    session['sections'] = cursor.fetchall()
+
+    conn.close()
+
+    return render_template('EditNewSect.html', ver=app.version, id_application=id_application, pages=pages)
+
+
+@app.route('/delsect/')
+def delsect():
+
+    id_application = request.args.get('id_application', -1,type=int)
+    nompage_sect = request.args.get('nompage', 1,type=int)
+    conn = psycopg2.connect(host=app.config['HOSTDATABASE'], user=app.config['USERNAME'],
+                            password=app.config['PASSWORD'], dbname=app.config['DBNAME'])
+    cursor = conn.cursor()
+
+    cursor.execute("delete from  section where  id_section =%s ", (request.args.get('idsect', '-1'),))
+    conn.commit()
+    cursor.execute(
+        "select count(*) from section  where  id_application=" + str(id_application))
+    amountrec = cursor.fetchall()[0][0]
+
+    maxpage = (amountrec // app.lenthuserlistpage) + 1
+    pages = dict()
+    pages['sectlist_nompage'] = nompage_sect
+    pages['sectlist_minpage'] = nompage_sect - 5
+    if pages['sectlist_minpage'] < 1:
+        pages['sectlist_minpage'] = 1
+
+    pages['sectlist_maxpage'] = nompage_sect + 5
+    if pages['sectlist_maxpage'] > maxpage:
+        pages['sectlist_maxpage'] = maxpage
+
+    pages['nmsectpages'] = []
+    maxsectpages = pages['sectlist_maxpage']
+    for i in range(pages['sectlist_minpage'], pages['sectlist_maxpage'] + 1):
+        pages['nmsectpages'].append(i)
+    # создаем список секций и сохраняем в сессии
+    cursor.execute(
+        "select id_section, namesection, id_member from section  where  id_application=" + str(id_application))
+
+    session['sections'] = cursor.fetchall()
+
+    conn.close()
+
+    return render_template('EditNewSect.html', ver=app.version, id_application=id_application, pages=pages)
+
+
 
 if __name__ == '__main__':
     app.run()

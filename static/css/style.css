@@ -128,11 +128,16 @@ table caption{
 */
 #logtable,#regtable , #edapplicationtable  {
             border-spacing:4px 4px;
-            width:calc(100% - 0px);
+            width:100%;
 
             border: 1px solid black;
         }
 
+#edNewAppSect {
+            border-spacing:4px 4px;
+            width:100%;
+
+}
 
 #bd{height: 1ex;}
 

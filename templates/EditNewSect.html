@@ -1,0 +1,61 @@
+                                <table class="sectionTable" >
+                                        <caption>Секции конференции<br/>   <a href="#modal" >Добавить секцию</a> </caption>
+                                        <tr>
+                                            <th>
+                                                Наименование секции
+                                            </th>
+                                            <th>
+                                                Модератор
+                                            </th>
+                                            <th>
+                                                Действия
+                                            </th>
+
+                                        </tr>
+
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="3">
+                                                    <div class="pagerow">
+
+                                                        {% if (pages['sectlist_nompage']==1) %}
+                                                            <a class='nextprew' href='/listissue/1/{{id_application}}'>Пред</a>
+                                                        {% else %}
+                                                            <a class='nextprew' href='/listissue/{{ pages.sectlist_nompage-1 }}/{{id_application}}'>Пред</a>
+                                                        {% endif %}
+
+                                                        {% for pg in pages['nmsectpages'] %}
+                                                            {% if pg!=pages['sectlist_nompage'] %}
+                                                                <a class='page' href='/listissue/{{ pg}}/{{id_application}}'>{{ pg }}</a>
+                                                            {% else %}
+                                                                <a class="currentpage" href='/listissue/{{ pg}}/{{id_application}}'>{{ pg }}</a>
+                                                            {% endif %}
+
+                                                        {% endfor %}
+
+                                                        <a class='nextprew' href='/listissue/{%if pages.sectlist_nompage>=pages.sectlist_maxpage%}{{pages.sectlist_maxpage}}{% else %}{{ pages.sectlist_nompage+1}}{%endif%}/{{id_application}}'>След</a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+
+
+                                    {% for s in session.sections %}
+                                        <tr>
+                                            <td>
+                                                <a href='/edit_sec/{{ s[0]}}/1'>{{ s[1] }}</a> <!-- название -->
+                                            </td>
+                                            <td>
+                                                <a href='/edit_sec/{{ s[0]}}/1'>{{ s[2] }}</a>   <!-- модератор -->
+                                            </td>
+
+                                            <td>
+                                                <a href='' onclick='delsect( {{ s[0]}}, {{ s[1]}}  )'>Удалить</a>
+                                            </td>
+
+                                        </tr>
+
+                                    {% endfor %}
+
+                                </table>
+
