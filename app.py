@@ -501,7 +501,7 @@ def edit_application(id_application, nompage_sect):
 #****************
 
         cursor.execute(
-            "select count(*) from section  where  id_application=" + str(id_application))
+            "select count(*) from section s, members m  where  m.id_member=s.id_member and id_application=" + str(id_application))
         amountrec = cursor.fetchall()[0][0]
 
         maxpage = (amountrec // app.lenthuserlistpage) + 1
@@ -509,7 +509,7 @@ def edit_application(id_application, nompage_sect):
         pages['sectlist_nompage'] = nompage_sect
         pages['sectlist_minpage'] = nompage_sect - 5
         if pages['sectlist_minpage'] < 1:
-            pages['sectlist_minpage'] = 1
+            pages['sectlist_minpage'] = 13
 
         pages['sectlist_maxpage'] = nompage_sect + 5
         if pages['sectlist_maxpage'] > maxpage:
@@ -521,7 +521,7 @@ def edit_application(id_application, nompage_sect):
             pages['nmsectpages'].append(i)
 # создаем список секций и сохраняем в сессии
         cursor.execute(
-            "select id_section, namesection, id_member from section  where  id_application=" + str(id_application))
+            "select  s.id_section, s.namesection, m.famely||' '||substring(m.name,1,1)||' '||substring(m.surname,1,1) nm, s.id_member from section s, members m  where  m.id_member=s.id_member and id_application=" + str(id_application))
 
         session['sections'] = cursor.fetchall()
         conn.close()
@@ -860,33 +860,41 @@ def newsect():
 #    d=dict()
 #    d['name'] = dd
 #    return jsonify(d)
+    idsect = request.args.get('idsect', -1, type=int)
 
-    id_application = request.args.get('id_application', -1,type=int)
-    nompage_sect = request.args.get('nompage', 1,type=int)
+    id_application = request.args.get('id_application', -1, type=int)
+    nompage_sect = request.args.get('nompage', 1, type=int)
     conn = psycopg2.connect(host=app.config['HOSTDATABASE'], user=app.config['USERNAME'],
-                            password=app.config['PASSWORD'], dbname=app.config['DBNAME'])
+                        password=app.config['PASSWORD'], dbname=app.config['DBNAME'])
     cursor = conn.cursor()
+    if idsect == -1:
+        cursor.execute(
+            "insert into section (namesection, id_member, id_application) values (%s, %s , %s) returning id_section", (request.args.get('namenewsect', 'Нет наименования'), request.args.get('id_moder', '-1'), str(id_application),))
+        IdSect=cursor.fetchall()[0][0]
 
-
-    cursor.execute(
-        "insert into section (namesection, id_member, id_application) values (%s, %s , %s) returning id_section", (request.args.get('namenewsect', 'Нет наименования'), request.args.get('id_moder', '-1'), str(id_application),))
-    IdSect=cursor.fetchall()[0][0]
-
+    else:
+        cursor.execute(
+            "update section set namesection = %s, id_member= %s where id_section = %s", (request.args.get('namenewsect', 'Нет наименования'), request.args.get('id_moder', '-1'), str(idsect),))
 
     conn.commit()
+    rt = dataforsecr(cursor, id_application, nompage_sect)
+    conn.close()
+    return rt
 
-    cursor.execute(
-        "select count(*) from section  where  id_application=" + str(id_application))
-    amountrec = cursor.fetchall()[0][0]
+
+def dataforsecr(cnc, id_application, nompage_s):
+    cnc.execute(
+        "select count(*) from section s, members m  where  m.id_member=s.id_member and id_application=" + str(id_application))
+    amountrec = cnc.fetchall()[0][0]
 
     maxpage = (amountrec // app.lenthuserlistpage) + 1
     pages = dict()
-    pages['sectlist_nompage'] = nompage_sect
-    pages['sectlist_minpage'] = nompage_sect - 5
+    pages['sectlist_nompage'] = nompage_s
+    pages['sectlist_minpage'] = nompage_s - 5
     if pages['sectlist_minpage'] < 1:
         pages['sectlist_minpage'] = 1
 
-    pages['sectlist_maxpage'] = nompage_sect + 5
+    pages['sectlist_maxpage'] = nompage_s + 5
     if pages['sectlist_maxpage'] > maxpage:
         pages['sectlist_maxpage'] = maxpage
 
@@ -895,14 +903,13 @@ def newsect():
     for i in range(pages['sectlist_minpage'], pages['sectlist_maxpage'] + 1):
         pages['nmsectpages'].append(i)
     # создаем список секций и сохраняем в сессии
-    cursor.execute(
-        "select id_section, namesection, id_member from section  where  id_application=" + str(id_application))
+    cnc.execute(
+        "select s.id_section, s.namesection, m.famely||' '||substring(m.name,1,1)||' '||substring(m.surname,1,1) nm, s.id_member from section s, members m  where  m.id_member=s.id_member and id_application=" + str(id_application))
 
-    session['sections'] = cursor.fetchall()
-
-    conn.close()
+    session['sections'] = cnc.fetchall()
 
     return render_template('EditNewSect.html', ver=app.version, id_application=id_application, pages=pages)
+
 
 
 @app.route('/delsect/')
@@ -916,34 +923,10 @@ def delsect():
 
     cursor.execute("delete from  section where  id_section =%s ", (request.args.get('idsect', '-1'),))
     conn.commit()
-    cursor.execute(
-        "select count(*) from section  where  id_application=" + str(id_application))
-    amountrec = cursor.fetchall()[0][0]
 
-    maxpage = (amountrec // app.lenthuserlistpage) + 1
-    pages = dict()
-    pages['sectlist_nompage'] = nompage_sect
-    pages['sectlist_minpage'] = nompage_sect - 5
-    if pages['sectlist_minpage'] < 1:
-        pages['sectlist_minpage'] = 1
-
-    pages['sectlist_maxpage'] = nompage_sect + 5
-    if pages['sectlist_maxpage'] > maxpage:
-        pages['sectlist_maxpage'] = maxpage
-
-    pages['nmsectpages'] = []
-    maxsectpages = pages['sectlist_maxpage']
-    for i in range(pages['sectlist_minpage'], pages['sectlist_maxpage'] + 1):
-        pages['nmsectpages'].append(i)
-    # создаем список секций и сохраняем в сессии
-    cursor.execute(
-        "select id_section, namesection, id_member from section  where  id_application=" + str(id_application))
-
-    session['sections'] = cursor.fetchall()
-
+    rt = dataforsecr(cursor, id_application, nompage_sect)
     conn.close()
-
-    return render_template('EditNewSect.html', ver=app.version, id_application=id_application, pages=pages)
+    return rt
 
 
 

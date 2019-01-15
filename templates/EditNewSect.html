@@ -1,5 +1,5 @@
                                 <table class="sectionTable" >
-                                        <caption>Секции конференции<br/>   <a href="#modal" >Добавить секцию</a> </caption>
+                                        <caption>Секции конференции<br/>   <a href="#modal" onclick="newsect" >Добавить секцию</a> </caption>
                                         <tr>
                                             <th>
                                                 Наименование секции
@@ -41,16 +41,16 @@
 
 
                                     {% for s in session.sections %}
-                                        <tr>
+                                        <tr id="sect{{s[0]}}">
                                             <td>
-                                                <a href='/edit_sec/{{ s[0]}}/1'>{{ s[1] }}</a> <!-- название -->
+                                                <a href='#' onclick="editsect(event, {{ s[0]}}, '{{ s[1]}}', {{s[3]}} )" >{{ s[1] }}</a> <!-- название -->
                                             </td>
                                             <td>
-                                                <a href='/edit_sec/{{ s[0]}}/1'>{{ s[2] }}</a>   <!-- модератор -->
+                                                <a href='#' onclick="editsect(event, {{ s[0]}}, '{{ s[1]}}', {{s[3]}} )" >{{s[2]}}</a>   <!-- модератор -->
                                             </td>
 
                                             <td>
-                                                <a href='' onclick='delsect( {{ s[0]}}, {{ s[1]}}  )'>Удалить</a>
+                                                <a href='#' onclick="delsect( '{{ s[0]}}', '{{ s[1]}}'  )">Удалить</a>
                                             </td>
 
                                         </tr>

@@ -55,20 +55,53 @@
 
     function sendquery()
     {
-        var dt = {namenewsect : document.getElementById("inpnmsection").value, id_moder:document.getElementById("selModerNew").value, nompage:{{  pages.sectlist_nompage }}, id_application:{{id_application}} };
+        var dt = {idsect:document.getElementById("idsect").value ,namenewsect : document.getElementById("inpnmsection").value, id_moder:document.getElementById("selModerNew").value, nompage:{{  pages.sectlist_nompage }}, id_application:{{id_application}} };
         $.get("/newsect",dt,handlenewsect,"html");
     }
     function handlenewsect(reqdate)
     {
-        alert("Пришло "+reqdate)
+/*        alert("Пришло "+reqdate) */
         document.getElementById("sect_place").innerHTML=reqdate
     }
 
-    function delsect(idsect, nmsect)
+    function editsect(event,idsct, nmsect,idmoder)
     {
+        document.getElementById("idsect").value=idsct;
+        document.getElementById("inpnmsection").value=nmsect;
+        alert('Меняем');
+        var selects=document.getElementById('selModerNew');
+        for(var i=0;i<selects.options.length;i++)
+        {
+	        if(idmoder==selects.options[i].value)
+	        {
+	                alert('нашли');
+	            selects.options[i].setAttribute("selected", "selected");
+	        }
+	    }
+
+
+        location.href ="#modal";
+        event.preventDefault();
+    }
+
+    function newsect(event)
+    {
+        document.getElementById("idsect").value=-1;
+        document.getElementById("inpnmsection").value='';
+        alert('Новая');
+        var selects=document.getElementById('selModerNew');
+        selects.options[0].setAttribute("selected", "selected");
+
+
+        location.href ="#modal";
+        event.preventDefault();
+    }
+
+    function delsect(idsct, nmsect)
+    {
+        var dt = {idsect : idsct, nompage:{{  pages.sectlist_nompage }}, id_application:{{id_application}} };
         if (confirm("Удалить секцию ?"+nmsect))
         {
-            var dt = {idsect : idsect, nompage:{{  pages.sectlist_nompage }}, id_application:{{id_application}} };
             $.get("/delsect",dt,handlenewsect,"html");
         }
 
@@ -337,6 +370,7 @@
         <div class="modal-dialog" >
             <div class="headmodal">
                 <h> Новая секция </h>
+                <input class="ModNewsection" value="-1" required tabindex="100" id="idsect" type="text" name="idsect" hidden >
             </div>
             <div class="bodymodal">
                 <table id = "edNewAppSect">
